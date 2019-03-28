@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>OCR</title>
+<style type="text/css">
+.main{
+	margin:0 auto;
+	margin-top:100px;
+	width:500px;
+}
+#img{
+	display:none;
+}
+#view{
+	width:500px;
+}
+#view2{
+	width:400px;
+}
+</style>
+</head>
+<body>
+<div class="main">
+	<input type="file" id="img">
+	<button id="select">选择图片</button>
+	<img id="view">
+	<div id="ocrtext"></div>
+</div>
+
+</body>
+<script type="text/javascript" src="/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+
+$('#select').click(function(){
+	$('#img').click();
+})
+
+document.getElementById('img').onchange = function(){
+    var file = this.files[0];
+    //创建FileReader
+    var re = new FileReader();
+    //读取文件
+    re.readAsDataURL(file);
+    //读取完成后显示BASE64
+    re.onload = function(){
+        $('#view').attr('src',re.result);
+        ocr(file);
+    }
+
+}
+
+function ocr(file){
+    var data = new FormData()
+    data.append('storagePath',"/test/")
+    data.append('file', file) // file 对象
+    // 提交
+    $.ajax({
+        url: '/ocr',
+        type: 'post',
+        data: data,
+        processData: false, // 默认 | 不处理数据
+        contentType: false,// 默认 | 不设置内容类型
+        dataType: 'json',
+        beforeSend:function(){
+            $('#ocrtext').text('正在识别......');
+		},
+        success: function(json){
+            console.log(json);
+            $('#ocrtext').html(json.ocrtext);
+        }
+    })
+}
+
+</script>
+</html>
