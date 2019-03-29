@@ -11,11 +11,21 @@
     <!-- ocr -->
     <servlet>
         <servlet-name>OCR</servlet-name>
-        <servlet-class>com.ljf.opencvocr.OCRServlet</servlet-class>
+        <servlet-class>com.ljf.opencvocr.servlet.OCRServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>OCR</servlet-name>
         <url-pattern>/ocr</url-pattern>
+    </servlet-mapping>
+
+    <!-- face detect -->
+    <servlet>
+        <servlet-name>FaceDetect</servlet-name>
+        <servlet-class>com.ljf.opencvocr.servlet.FaceServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FaceDetect</servlet-name>
+        <url-pattern>/face</url-pattern>
     </servlet-mapping>
 
 </web-app>
