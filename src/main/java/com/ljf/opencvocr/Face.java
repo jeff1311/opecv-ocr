@@ -102,9 +102,16 @@ public class Face {
 		// 2 读取测试图片
 		Mat image = Imgcodecs.imread(imgPath);
 		// 3 固定尺寸
-		int width = 1200;
-		int height = width * image.height() / image.width();
-		Size size = new Size(width, height);
+		Size size = null;
+        if(image.width() > image.height()){        	
+        	int width = 1200;
+        	int height = width * image.height() / image.width();
+        	size = new Size(width, height);
+        }else{
+        	int height = 1200;
+        	int width = height * image.width() / image.height();
+        	size = new Size(width, height);
+        }
 		Imgproc.resize(image, image, size);
 
 		Rect[] faces = autoRotate(image, facebook);
