@@ -1,15 +1,6 @@
 package com.ljf.opencvocr;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
@@ -18,7 +9,7 @@ public class Test3 {
 	public static void main(String[] args) {
 		String opencvLib = Util.getClassPath() + "opencv/dll/opencv_java320.dll";
         System.load(opencvLib);
-        String srcPath = "H:/opencv/sfz/2.jpg";
+        String srcPath = "E:/ocr/8.jpg";
 		
         Mat src = Imgcodecs.imread(srcPath);
         Size size = null;
@@ -32,36 +23,34 @@ public class Test3 {
         	size = new Size(width, height);
         }
 		Imgproc.resize(src, src, size);
-		
+
 		Mat dst = src.clone();
-        Imgproc.cvtColor(dst, dst, Imgproc.COLOR_RGB2GRAY);
-        // 高斯模糊，主要用于降噪
-//        Imgproc.GaussianBlur(dst, dst, new Size(3, 3), 10);
-        Imgproc.GaussianBlur(dst, dst, new Size(3,3), 3, 3);
-        
-        //二值化（自适应）
+		//灰度
+		Imgproc.cvtColor(dst, dst, Imgproc.COLOR_RGB2GRAY);
+		//二值化（自适应）
   		int blockSize = 25;
-  		int constValue = 5;//ADAPTIVE_THRESH_GAUSSIAN_C
+  		int constValue = 50;
   		Imgproc.adaptiveThreshold(dst, dst, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY_INV, blockSize, constValue);
-  		ImgUtil.window(dst);
-  		// 膨胀，连接边缘
-//  		Imgproc.dilate(dst, dst, new Mat(), new Point(-1,-1), 1, 1, new Scalar(1));
-//  		ImgUtil.window(dst);
-        //轮廓检测
-//        Imgproc.Canny(dst, dst, 20, 90, 3, false);
-//        ImgUtil.window(dst);
-        
-        //轮廓提取
-        List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-        Mat hierarchy1 = new Mat();
-        Imgproc.findContours(dst, contours, hierarchy1, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        
-        for(int i = 0;i < contours.size();i ++){   
-        	MatOfPoint points = contours.get(i);
-        	Imgproc.convexHull(points, new MatOfInt());
-        }
-        ImgUtil.window(dst);
-        
+		ImgUtil.window("自适应二值化",dst);
+		// 中值滤波，同样用于降噪
+//        Imgproc.medianBlur(dst, dst, 3);
+//		ImgUtil.window("中值滤波",dst);
+		//腐蚀
+		Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(3,3));//使用3*3交叉内核
+		Imgproc.dilate(dst, dst, kernel, new Point(-1, -1), 10);//以这个内核为中心膨胀N倍
+		ImgUtil.window("腐蚀",dst);
+
+		//掩膜锐化算法
+		//x(x,y) = 5 * x(x,y) - [x(x - 1,y) + x(x + 1,y) + x(x,y - 1) + x(x,y + 1)]
+//		Mat kernal = new Mat(3,3,CvType.CV_32FC1, new Scalar(0));
+//		kernal.put(0, 1, -1);
+//		kernal.put(1, 0, -1);
+//		kernal.put(1, 1, 5);
+//		kernal.put(1, 2, -1);
+//		kernal.put(2, 1, -1);
+//		Imgproc.filter2D(src, src, src.depth(), kernal);
+//		ImgUtil.window(src);
+
         //去除面积小于100像素的区域
 //        for(int i = 0;i < contours.size();i ++){
 //        	Rect br = Imgproc.boundingRect(contours.get(i));
@@ -78,28 +67,28 @@ public class Test3 {
 //        ImgUtil.window(dst);
         
         //找出最大轮廓
-        double maxArea = 0;
-      	//最大轮廓索引
-      	int maxIndex = 0;
-      	for(int i = 0;i < contours.size();i ++){
-      		Rect br = Imgproc.boundingRect(contours.get(i));
-      		if(maxArea < br.area()){
-      			maxArea = br.area();
-      			maxIndex = i;
-      		}
-      	}
+//        double maxArea = 0;
+//      	//最大轮廓索引
+//      	int maxIndex = 0;
+//      	for(int i = 0;i < contours.size();i ++){
+//      		Rect br = Imgproc.boundingRect(contours.get(i));
+//      		if(maxArea < br.area()){
+//      			maxArea = br.area();
+//      			maxIndex = i;
+//      		}
+//      	}
       	
-      	Rect maxRect = Imgproc.boundingRect(contours.get(maxIndex));
-      	int x = maxRect.x;
-		int y = maxRect.y;
-		int w = x + maxRect.width;
-		int h = y + maxRect.height;
-		Point point1 = new Point(x, y);
-		Point point2 = new Point(w, h);
-		Scalar scalar = new Scalar(255, 0, 255);
-		Imgproc.rectangle(src,point1,point2,scalar);
-        ImgUtil.window(src);
+//      	Rect maxRect = Imgproc.boundingRect(contours.get(maxIndex));
+//      	int x = maxRect.x;
+//		int y = maxRect.y;
+//		int w = x + maxRect.width;
+//		int h = y + maxRect.height;
+//		Point point1 = new Point(x, y);
+//		Point point2 = new Point(w, h);
+//		Scalar scalar = new Scalar(255, 0, 255);
+//		Imgproc.rectangle(src,point1,point2,scalar);
+//        ImgUtil.window(src);
         
 	}
-	
+
 }

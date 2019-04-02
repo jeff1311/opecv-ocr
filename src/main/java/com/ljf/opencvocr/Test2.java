@@ -42,7 +42,7 @@ public class Test2 {
 		String storagePath = "E:/ocr/test/" + new Date().getTime() + ".jpg";
 		Imgcodecs.imwrite(storagePath, src);
 		ImgUtil.ocr(storagePath);
-		ImgUtil.window(src);
+		ImgUtil.window("img",src);
 		
 	}
 	

@@ -5,8 +5,6 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.util.Date;
 
 /**
@@ -27,20 +25,20 @@ public class Face {
 	 * @param imgPath
 	 */
 	public static Mat idcardCrop(String imgPath,boolean test){
-		// 1 读取OpenCV自带的人脸识别特征XML文件
 		//OpenCV 图像识别库一般位于 opencv\sources\data 下面
+		// 1 读取OpenCV自带的人脸识别特征XML文件
 		String faceXmlPath = Util.getClassPath() + "/opencv/xml/haarcascade_frontalface_alt.xml";
 		CascadeClassifier facebook = new CascadeClassifier(faceXmlPath);
 		// 2 读取测试图片
 		Mat image = Imgcodecs.imread(imgPath);
-		// 3 固定尺寸
+		// 3 修改尺寸
 		int width = 1200;
 		int height = width * image.height() / image.width();
 		Size size = new Size(width, height);
 		Imgproc.resize(image, image, size);
 		// 4 特征匹配
 		Rect[] faces = autoRotate(image, facebook);
-		// 6 为识别到的人脸画一个圈
+		// 5 算出身份证区域并裁图
 		int maxIndex = 0;
 		if(faces.length > 1){
 			double maxArea = 0d;
@@ -52,15 +50,15 @@ public class Face {
 			}
 		}
 		Rect faceRect = faces[maxIndex];
-		int x = (int) (faceRect.x - faceRect.width * 2.8);
-		int y = (int) (faceRect.y - faceRect.height / 1.7);
-		int w = (int) (x + faceRect.width * 4.2);
-		int h = (int) (y + faceRect.height * 2.6);
-		Point point1 = new Point(x, y);
-		Point point2 = new Point(w, h);
+		int x0 = (int) (faceRect.x - faceRect.width * 2.8);
+		int y0 = (int) (faceRect.y - faceRect.height / 1.7);
+		int w0 = (int) (x0 + faceRect.width * 4.2);
+		int h0 = (int) (y0 + faceRect.height * 2.7);
+		Point point1 = new Point(x0, y0);
+		Point point2 = new Point(w0, h0);
 		Rect rect = new Rect(point1,point2);
 		Mat crop = new Mat(image, rect);
-		// 7 把人像区域置为白色
+		// 6 把人像区域置为白色
 		//（方案1）根据人脸检测得到的矩形位置算出大概人像区域
 		int x1 = (int) (faceRect.x - faceRect.width / 3.5);
 		int y1 = (int) (faceRect.y - faceRect.height / 2);
@@ -74,16 +72,28 @@ public class Face {
 		//待测试。。。
 
 		//遍历roi区域像素，变为白色
-		for( int i = 0; i < mask.rows(); ++i){
-			for( int j = 0; j < mask.cols(); ++j ){
+		for(int i = 0; i < mask.rows();i ++){
+			for( int j = 0; j < mask.cols();j ++){
 				double[] data = mask.get(0,0);
 				mask.put(i,j,data);
 			}
 		}
+
+		//遍历裁剪部分像素，只保留黑色
+//		for(int x = 0;x < crop.rows();x ++){
+//			for(int y = 0;y < crop.cols();y ++){
+//				double[] white = {255,255,255};
+//				double[] data = crop.get(x, y);
+//				if(data[0] > 100 && data[1] > 100 && data[2] > 100){
+//					crop.put(x,y,white);
+//				}
+//			}
+//		}
+
 		if(test){
 			String storagePath = "E:/ocr/faceRect/crop/" + new Date().getTime() + ".jpg";
 			Imgcodecs.imwrite(storagePath, crop);
-			// 7 保存图片
+			// 8 保存图片
 			String filename = "E:/ocr/faceRect/" + new Date().getTime() + ".jpg";
 			Imgcodecs.imwrite(filename, image);
 		}
@@ -96,12 +106,12 @@ public class Face {
 	 */
 	public static String detect(String imgPath,String outputPath){
 		// 1 读取OpenCV自带的人脸识别特征XML文件
-		//OpenCV 图像识别库一般位于 opencv\sources\data 下面
+		// OpenCV 图像识别库一般位于 opencv\sources\data 下面
 		String faceXmlPath = Util.getClassPath() + "/opencv/xml/haarcascade_frontalface_alt.xml";
 		CascadeClassifier facebook = new CascadeClassifier(faceXmlPath);
 		// 2 读取测试图片
 		Mat image = Imgcodecs.imread(imgPath);
-		// 3 固定尺寸
+		// 3 修改尺寸
 		Size size = null;
         if(image.width() > image.height()){        	
         	int width = 1200;
@@ -113,10 +123,10 @@ public class Face {
         	size = new Size(width, height);
         }
 		Imgproc.resize(image, image, size);
-
+		// 4 特征匹配
 		Rect[] faces = autoRotate(image, facebook);
 
-		// 6 为每张识别到的人脸画一个圈
+		// 5 为每张识别到的人脸画一个圈
 		for (int i = 0; i < faces.length; i++) {
 			int x = faces[i].x;
 			int y = faces[i].y;
@@ -127,16 +137,20 @@ public class Face {
 			Scalar scalar = new Scalar(0, 255, 0);
 			Imgproc.rectangle(image, point1, point2, scalar);
 		}
-		// 7 保存图片
+		// 6 保存图片
 		String fileName = new Date().getTime() + ".jpg";
 		Imgcodecs.imwrite(outputPath + fileName, image);
 		return fileName;
 	}
 
+	/**
+	 * 特征匹配&自动旋转
+	 * @param src
+	 * @param facebook
+	 * @return
+	 */
 	public static Rect[] autoRotate(Mat src,CascadeClassifier facebook){
-		// 4 特征匹配
 		MatOfRect face = new MatOfRect();
-
 		Rect[] faces = null;
 		boolean hasface = false;
 		int times = 0;
@@ -151,7 +165,7 @@ public class Face {
 				rotateRight(src);
 			}
 			facebook.detectMultiScale(src, face);
-			// 5 匹配 Rect 矩阵 数组
+			// 匹配 Rect 矩阵 数组
 			faces = face.toArray();
 			System.out.println("匹配到 " + faces.length + " 个人脸");
 			if(faces.length > 0){

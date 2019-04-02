@@ -126,17 +126,30 @@ public class ImgUtil {
 		List<MatOfPoint> sortMat = sortMat(contours);
 		for(int i = 0;i < sortMat.size();i ++){
         	Rect rect = Imgproc.boundingRect(sortMat.get(i));
+
+        	//画出矩形
+//            int x = rect.x;
+//            int y = rect.y;
+//            int w = x + rect.width;
+//            int h = y + rect.height;
+//            Point point1 = new Point(x, y);
+//            Point point2 = new Point(w, h);
+//            Scalar scalar = new Scalar(255, 0, 255);
+//            Imgproc.rectangle(src,point1,point2,scalar);
+
             Mat srcImg = new Mat(src, rect);
             Mat tmpImg = new Mat();
             srcImg.copyTo(tmpImg);
-            String storagePath = "E:/ocr/test/" + i + ".jpg";
+            String storagePath = "E:/ocr/test/block/" + i + ".jpg";
             Imgcodecs.imwrite(storagePath, tmpImg);
             System.out.println(rect.area());
-            if(rect.area() > 10000){
+            if(rect.area() > 3000){
                 result = result.replace("\n","<br>");
                 result = result + ocr(storagePath) + "<br>";
             }
         }
+        String storagePath = "E:/ocr/test/src.jpg";
+        Imgcodecs.imwrite(storagePath, src);
         return result;
 	}
 	
@@ -475,15 +488,30 @@ public class ImgUtil {
         instance.setLanguage("chi_sim");//chi_sim eng
         String result = null;
         try {
-        	BufferedImage src = ImageIO.read(file);
-        	BufferedImage binary = binary(src, src);
-        	ImageIO.write(src, "jpg", new File("E:/ocr/binary/" + new Date().getTime() + ".jpg"));
+            //读取图像
+            Mat src = Imgcodecs.imread(path);
+            //灰度图
+            Imgproc.cvtColor(src,src,Imgproc.COLOR_BGR2GRAY);
+            //二值化（自适应）
+            int blockSize = 31;
+            int constValue = 30;
+            Imgproc.adaptiveThreshold(src, src, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, blockSize, constValue);
+            //过滤杂纹
+//            Imgproc.medianBlur(src, src,3);
+            Imgcodecs.imwrite("E:/ocr/test/binary/" + new Date().getTime() + ".jpg",src);
+            BufferedImage binary = Mat2BufImg(src, ".jpg");
+
+//        	BufferedImage src = ImageIO.read(file);
+//        	BufferedImage binary = binary(src, src);
+//        	ImageIO.write(src, "jpg", new File("E:/ocr/test/binary/" + new Date().getTime() + ".jpg"));
+
             result =  instance.doOCR(binary);
         } catch (TesseractException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-			e.printStackTrace();
-		}
+        }
+//        catch (IOException e){
+//            e.printStackTrace();
+//        }
         System.out.println(result);
         return result;
     }
@@ -578,9 +606,8 @@ public class ImgUtil {
         return bimage;
     }
 
-    public static void window(Mat mat){
-    	ShowImage window = new ShowImage(mat);
-        window.getFrame().setVisible(true);
+    public static void window(String title,Mat mat){
+    	new ShowImage(title,mat);
     }
     
 }

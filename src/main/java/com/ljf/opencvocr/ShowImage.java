@@ -3,31 +3,19 @@ package com.ljf.opencvocr;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.*;
 
 import org.opencv.core.Mat;
 
 public class ShowImage {
 
-    private JFrame frame;
-
-    /**
-     * Create the application.
-     */
-    public ShowImage(Mat mat) {
-        initialize(mat);
+    public ShowImage(String title,Mat mat) {
+        init(title,mat);
     }
 
-    public JFrame getFrame() {
-        return frame;
-    }
-    /**
-     * Initialize the contents of the frame.
-     */
-    private void initialize(Mat mat) {
-        frame = new JFrame();
+    private void init(String title,Mat mat) {
+        JFrame frame = new JFrame();
+        frame.setTitle(title);
         frame.setBounds(100, 100, mat.width()+15, mat.height()+37);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
@@ -41,6 +29,8 @@ public class ShowImage {
         label.setBounds(0, 0, mat.width(), mat.height());
         frame.getContentPane().add(label);
         label.setIcon(new ImageIcon(image));
+        frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        frame.setVisible(true);
     }
 
 }

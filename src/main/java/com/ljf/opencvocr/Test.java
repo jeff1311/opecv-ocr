@@ -39,7 +39,7 @@ public class Test {
         // 高斯模糊，主要用于降噪
         Imgproc.GaussianBlur(dst, dst, new Size(3, 3), 0);
         //GaussianBlur图
-        ImgUtil.window(dst);
+        ImgUtil.window("GaussianBlur",dst);
         // 二值化图，主要将灰色部分转成白色，使内容为黑色
         Imgproc.threshold(dst, dst, 150, 255, Imgproc.THRESH_BINARY);
         
@@ -51,7 +51,7 @@ public class Test {
 //		Core.bitwise_not(dst, dst);
   		
         //threshold图
-        ImgUtil.window(dst);
+        ImgUtil.window("threshold",dst);
         // 中值滤波，同样用于降噪
 //        Imgproc.medianBlur(dst, dst, 3);
 //        //medianBlur图
@@ -60,17 +60,17 @@ public class Test {
 //        Imgproc.erode(dst, dst, new Mat(15, 15, CvType.CV_8UC1));
 //        //erode图
 //        ImgUtil.window(dst);
-        
         //腐蚀
-  		Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3,3));//使用3*3交叉内核
-  		Imgproc.erode(dst, dst, kernel, new Point(-1, -1), 20);//以这个内核为中心膨胀N倍
-  		ImgUtil.window(dst);
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS,new Size(3,3));//使用3*3交叉内核
+        Imgproc.erode(dst, dst, kernel, new Point(-1, -1), 20);//以这个内核为中心膨胀N倍
+        ImgUtil.window("腐蚀",dst);
+
   		
         //轮廓提取
         List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(dst, contours, hierarchy, Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE);
-        
+
         for(int i = 0;i < contours.size();i ++){
         	Rect br = Imgproc.boundingRect(contours.get(i));
         	if(br.area() > 2000){        		
@@ -101,7 +101,7 @@ public class Test {
         Mat src2 = new Mat(src, maxRect);
         
         //轮廓图
-        ImgUtil.window(src2);
+        ImgUtil.window("轮廓图",src2);
         
     }
 
