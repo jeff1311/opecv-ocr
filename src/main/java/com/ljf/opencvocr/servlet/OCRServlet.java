@@ -3,6 +3,7 @@ package com.ljf.opencvocr.servlet;
 import com.alibaba.fastjson.JSONObject;
 import com.ljf.opencvocr.Model;
 import com.ljf.opencvocr.OCR;
+import com.ljf.opencvocr.Upload;
 import com.ljf.opencvocr.Util;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -32,17 +33,14 @@ public class OCRServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Model uploadInfo = Util.getUploadInfo(req);
+        Model uploadInfo = Upload.getInfo(req);
         Map<String, String> params = uploadInfo.getParams();
         String storagePath = params.get("storagePath");
         String storageName = params.get("storageName");
         BufferedImage img = uploadInfo.getImg();
-//        img = ImgUtil.binary(img, img);
         String tempPath = new Date().getTime() + ".jpg";
         ImageIO.write(img, "jpg", new File("E:/ocr/" + storagePath + tempPath));
-//        String ocrtext = ImgUtil.ocr(img);
-
-        String ocrtext = OCR.ocr("E:/ocr/" + storagePath + tempPath,false);
+        String ocrtext = OCR.execute("E:/ocr/" + storagePath + tempPath,false);
         System.out.println(ocrtext);
         JSONObject json = new JSONObject();
         json.put("code", 200);
