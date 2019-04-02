@@ -143,7 +143,7 @@ public class ImgUtil {
             String storagePath = "E:/ocr/test/block/" + i + ".jpg";
             Imgcodecs.imwrite(storagePath, tmpImg);
             System.out.println(rect.area());
-            if(rect.area() > 3000){
+            if(rect.area() > 10000){
                 result = result.replace("\n","<br>");
                 result = result + ocr(storagePath) + "<br>";
             }
@@ -493,11 +493,32 @@ public class ImgUtil {
             //灰度图
             Imgproc.cvtColor(src,src,Imgproc.COLOR_BGR2GRAY);
             //二值化（自适应）
-            int blockSize = 31;
+            int blockSize = 41;
             int constValue = 30;
             Imgproc.adaptiveThreshold(src, src, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, blockSize, constValue);
             //过滤杂纹
 //            Imgproc.medianBlur(src, src,3);
+
+            //轮廓检测
+            Mat temp = src.clone();
+            Imgproc.Canny(temp, temp, 20, 60);
+            ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+            Mat hierarchy = new Mat();
+            Imgproc.findContours(temp, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            //去除面积小于20像素的区域
+            for(int j = 0;j < contours.size();j ++){
+                Rect br = Imgproc.boundingRect(contours.get(j));
+                if(br.area() < 20){
+                    Mat r = new Mat(src, br);
+                    for(int x = 0;x < r.rows();x ++){
+                        for(int y = 0;y < r.cols();y ++){
+                            double[] data = {255};
+                            r.put(x, y, data);
+                        }
+                    }
+                }
+            }
+
             Imgcodecs.imwrite("E:/ocr/test/binary/" + new Date().getTime() + ".jpg",src);
             BufferedImage binary = Mat2BufImg(src, ".jpg");
 

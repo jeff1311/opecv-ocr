@@ -31,14 +31,9 @@ public class Face {
 		CascadeClassifier facebook = new CascadeClassifier(faceXmlPath);
 		// 2 读取测试图片
 		Mat image = Imgcodecs.imread(imgPath);
-		// 3 修改尺寸
-		int width = 1200;
-		int height = width * image.height() / image.width();
-		Size size = new Size(width, height);
-		Imgproc.resize(image, image, size);
-		// 4 特征匹配
+		// 3 特征匹配
 		Rect[] faces = autoRotate(image, facebook);
-		// 5 算出身份证区域并裁图
+		// 4 算出身份证区域并裁图
 		int maxIndex = 0;
 		if(faces.length > 1){
 			double maxArea = 0d;
@@ -58,8 +53,8 @@ public class Face {
 		Point point2 = new Point(w0, h0);
 		Rect rect = new Rect(point1,point2);
 		Mat crop = new Mat(image, rect);
-		// 6 把人像区域置为白色
-		//（方案1）根据人脸检测得到的矩形位置算出大概人像区域
+		// 5 把人像区域置为白色
+		// 根据人脸检测得到的矩形位置算出大概人像区域
 		int x1 = (int) (faceRect.x - faceRect.width / 3.5);
 		int y1 = (int) (faceRect.y - faceRect.height / 2);
 		int w1 = (int) (x1 + faceRect.width * 1.6);
@@ -68,10 +63,8 @@ public class Face {
 		Point point4 = new Point(w1, h1);
 		Rect f = new Rect(point3,point4);
 		Mat mask = new Mat(image, f);
-		//（方案2）先根据人脸识别裁剪身份证区域，然后再轮廓提取，遍历最大矩形区域像素，颜色改为白色
-		//待测试。。。
 
-		//遍历roi区域像素，变为白色
+		// 遍历roi区域像素，变为白色
 		for(int i = 0; i < mask.rows();i ++){
 			for( int j = 0; j < mask.cols();j ++){
 				double[] data = mask.get(0,0);
@@ -90,13 +83,21 @@ public class Face {
 //			}
 //		}
 
+		// 6 修改尺寸
+		int width = 1200;
+		int height = width * crop.height() / crop.width();
+		Size size = new Size(width, height);
+		Imgproc.resize(crop, crop, size);
+
+		// 保存图片
 		if(test){
 			String storagePath = "E:/ocr/faceRect/crop/" + new Date().getTime() + ".jpg";
 			Imgcodecs.imwrite(storagePath, crop);
-			// 8 保存图片
+
 			String filename = "E:/ocr/faceRect/" + new Date().getTime() + ".jpg";
 			Imgcodecs.imwrite(filename, image);
 		}
+
 		return crop;
 	}
 
