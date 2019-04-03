@@ -179,7 +179,7 @@ public class ImgUtil {
                         name = name;
                     }
                 }
-                result.put("name",filter(name));
+                result.put("name",nameFilter(filter(name)));
             }
             if(text.contains("族")){
                 String nationality = text;
@@ -189,6 +189,7 @@ public class ImgUtil {
                 if(nIndex != -1){
                     nationality = nationality.substring(0,nIndex);
                 }
+                nationality = nationality.replace("汊","汉");
                 nationality = nationality.replace("灰","汉");
                 result.put("nationality",filter(nationality));
             }
@@ -208,7 +209,12 @@ public class ImgUtil {
             if((text.contains("省") || text.contains("市") || text.contains("区") || text.contains("县")) && text.length() > 10){
                 String address = text;
                 address = address.replace(" ","");
-                int aIndex = address.indexOf("住址");
+                int aIndex = 0;
+                if(address.indexOf("住址") == -1){
+                    aIndex = address.indexOf("址");
+                }else{
+                    aIndex = address.indexOf("住址");
+                }
                 if(aIndex != -1){
                     address = address.substring(aIndex + 1);
                 }
@@ -230,6 +236,7 @@ public class ImgUtil {
         return result;
 	}
 
+	//取出身份证号
 	public static String idCodeFilter(String text){
 	    String temp = text;
         temp = temp.replace(" ", "");
@@ -259,6 +266,7 @@ public class ImgUtil {
         return code;
     }
 
+    //根据身份证号获取性别
     public static String parseGender(String idCode){
 	    String gender = "";
 	    String s = idCode.substring(16,17);
@@ -271,13 +279,25 @@ public class ImgUtil {
         return gender;
     }
 
+    //过滤特殊字符
     public static String filter(String text){
-        String s = " _＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
+        String s = " ′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
         char[] sArray = s.toCharArray();
         for(char c : sArray){
             text = text.replace(String.valueOf(c),"");
         }
         return text;
+    }
+
+    //名字只能是中文，过滤英文字母和数字
+    public static String nameFilter(String name){
+        char[] chars = name.toCharArray();
+        for(char c : chars){
+            if ((c > 'A' && c < 'Z') || (c > 'a' && c < 'z') || Character.isDigit(c)) {
+                name = name.replace(String.valueOf(c),"");
+            }
+        }
+        return name;
     }
 
 	/**

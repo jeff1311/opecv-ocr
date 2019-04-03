@@ -180,7 +180,7 @@ public class Face {
 						maxArea = f.area();
 					}
 				}
-				if(maxArea > 10000){
+				if(maxArea > 18000){
 					hasface = true;
 				}
 			}
