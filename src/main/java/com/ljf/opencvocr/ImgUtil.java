@@ -199,12 +199,19 @@ public class ImgUtil {
                 String month = idCode.substring(10,12);
                 String day = idCode.substring(12,14);
                 result.put("year",year);
-                result.put("month",month);
-                result.put("day",day);
+                int m = Integer.parseInt(month.substring(0,1));
+                int d = Integer.parseInt(day.substring(0,1));
+                result.put("month",m == 0 ? month.toCharArray()[1] : month);
+                result.put("day",d == 0 ? day.toCharArray()[1] : day);
                 result.put("idCode",idCode);
             }
-            if((text.contains("省") || text.contains("市") || text.contains("区")) && text.length() > 10){
+            if((text.contains("省") || text.contains("市") || text.contains("区") || text.contains("县")) && text.length() > 10){
                 String address = text;
+                address = address.replace(" ","");
+                int aIndex = address.indexOf("住址");
+                if(aIndex != -1){
+                    address = address.substring(aIndex + 1);
+                }
                 String[] addressArray = address.split("\n");
                 address = address.replace("\n","");
                 if(addressArray[0].contains("住") || addressArray[0].contains("址")){
@@ -265,7 +272,7 @@ public class ImgUtil {
     }
 
     public static String filter(String text){
-        String s = " _-＿－ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
+        String s = " _＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
         char[] sArray = s.toCharArray();
         for(char c : sArray){
             text = text.replace(String.valueOf(c),"");

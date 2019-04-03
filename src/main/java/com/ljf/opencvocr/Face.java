@@ -45,19 +45,12 @@ public class Face {
 			}
 		}
 		Rect faceRect = faces[maxIndex];
-		int x0 = (int) (faceRect.x - faceRect.width * 2.8);
-		int y0 = (int) (faceRect.y - faceRect.height / 1.7);
-		int w0 = (int) (x0 + faceRect.width * 4.2);
-		int h0 = (int) (y0 + faceRect.height * 2.7);
-		Point point1 = new Point(x0, y0);
-		Point point2 = new Point(w0, h0);
-		Rect rect = new Rect(point1,point2);
-		Mat crop = new Mat(image, rect);
+
 		// 5 把人像区域置为白色
 		// 根据人脸检测得到的矩形位置算出大概人像区域
-		int x1 = (int) (faceRect.x - faceRect.width / 3.5);
+		int x1 = (int) (faceRect.x - faceRect.width / 3.8);
 		int y1 = (int) (faceRect.y - faceRect.height / 1.8);
-		int w1 = (int) (x1 + faceRect.width * 1.6);
+		int w1 = image.width();
 		int h1 = (int) (y1 + faceRect.height * 2.1);
 		Point point3 = new Point(x1, y1);
 		Point point4 = new Point(w1, h1);
@@ -71,6 +64,16 @@ public class Face {
 				mask.put(i,j,data);
 			}
 		}
+
+		int x0 = (int) (faceRect.x - faceRect.width * 2.8);
+		int y0 = (int) (faceRect.y - faceRect.height / 1.7);
+		int w0 = (int) (x0 + faceRect.width * 4.2);
+		int h0 = (int) (y0 + faceRect.height * 2.7);
+		Point point1 = new Point(x0, y0);
+		Point point2 = new Point(w0, h0);
+		Rect rect = new Rect(point1,point2);
+		Mat crop = new Mat(image, rect);
+
 
 		//遍历裁剪部分像素，只保留黑色
 //		for(int x = 0;x < crop.rows();x ++){
