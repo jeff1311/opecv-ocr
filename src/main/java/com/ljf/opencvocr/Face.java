@@ -175,16 +175,26 @@ public class Face {
 			if(faces.length > 0){
 				double maxArea = 0d;
 				for(Rect f : faces){
+//					int x = f.x;
+//					int y = f.y;
+//					int w = x + f.width;
+//					int h = y + f.height;
+//					Point point1 = new Point(x, y);
+//					Point point2 = new Point(w, h);
+//					Scalar scalar = new Scalar(0, 255, 0);
+//					Imgproc.rectangle(src, point1, point2, scalar);
+					
 					System.out.println(f.area());
 					if(maxArea < f.area()){
 						maxArea = f.area();
 					}
 				}
-				if(maxArea > 18000){
+				if(maxArea > 18000 && maxArea < 150000){
 					hasface = true;
 				}
 			}
 		}
+//		Imgcodecs.imwrite("E:/ocr/test/face.jpg", src);
 		return faces;
 	}
 

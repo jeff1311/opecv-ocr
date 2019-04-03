@@ -626,7 +626,7 @@ public class ImgUtil {
     }
 
     public static String ocr(String path){
-    	File file = new File(path);
+//    	File file = new File(path);
         ITesseract instance = new Tesseract();
         //设置训练库的位置
         String classPath = Util.getClassPath();
