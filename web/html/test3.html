@@ -23,7 +23,15 @@
 	<input type="file" id="img">
 	<button id="select">选择图片</button>
 	<img id="view">
-	<div id="ocrtext"></div>
+	姓名：<span id="name"></span>
+	<br><br>
+	性别：<span id="gender"></span>&nbsp;民族：<span id="nationality"></span>
+	<br><br>
+	出生：&nbsp;<span id="year"></span>&nbsp;年&nbsp;<span id="month"></span>&nbsp;月&nbsp;<span id="day"></span>&nbsp;日
+	<br><br>
+	住址：<span id="address"></span>
+	<br><br>
+	公民身份证号码：<span id="idCode"></span>
 </div>
 
 </body>
@@ -65,7 +73,15 @@ function ocr(file){
 		},
         success: function(json){
             console.log(json);
-            $('#ocrtext').html(json.ocrtext);
+            var ocrInfo = json.ocrInfo;
+            $('#name').text(ocrInfo.name);
+            $('#gender').text(ocrInfo.gender);
+            $('#nationality').text(ocrInfo.nationality);
+            $('#year').text(ocrInfo.year);
+            $('#month').text(ocrInfo.month);
+            $('#day').text(ocrInfo.day);
+            $('#address').text(ocrInfo.address);
+            $('#idCode').text(ocrInfo.idCode);
         }
     })
 }

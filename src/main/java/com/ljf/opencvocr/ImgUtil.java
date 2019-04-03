@@ -1,5 +1,6 @@
 package com.ljf.opencvocr;
 
+import com.alibaba.fastjson.JSONObject;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -19,6 +20,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.*;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -118,8 +120,9 @@ public class ImgUtil {
 		return dilated;
 	}
 	
-	public static String findContours(Mat srcDilate,Mat src){
-	    String result = "";
+	public static JSONObject findContours(Mat srcDilate,Mat src){
+	    JSONObject result = new JSONObject();
+	    String resultStr = "";
 		ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		Mat hierarchy = new Mat();
 		Imgproc.findContours(srcDilate, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -144,15 +147,132 @@ public class ImgUtil {
             Imgcodecs.imwrite(storagePath, tmpImg);
             System.out.println(rect.area());
             if(rect.area() > 10000){
-                result = result.replace("\n","<br>");
-                result = result + ocr(storagePath) + "<br>";
+                resultStr = resultStr + ocr(storagePath) + "<br>";
+//                resultStr = resultStr.replace("\n","<br>");
             }
         }
+
+        System.out.println(resultStr);
+
         String storagePath = "E:/ocr/test/src.jpg";
         Imgcodecs.imwrite(storagePath, src);
+
+        //筛选有用信息
+        String[] resultArray = resultStr.split("<br>");
+
+        for(int i = 0;i < resultArray.length;i ++){
+            String text = resultArray[i];
+            if(i == 0){
+                String name = text;
+                if(name.contains("名")){
+                    int index = name.indexOf("名");
+                    name = name.substring(index + 1);
+                    int nIndex = name.indexOf("\n");
+                    if(nIndex != -1){
+                        name = name.substring(0,nIndex);
+                    }
+                }else{
+                    int nIndex = name.indexOf("\n");
+                    if(nIndex != -1){
+                        name = name.substring(0,nIndex);
+                    }else{
+                        name = name;
+                    }
+                }
+                result.put("name",filter(name));
+            }
+            if(text.contains("族")){
+                String nationality = text;
+                int index = nationality.indexOf("族");
+                nationality = nationality.substring(index + 1);
+                int nIndex = nationality.indexOf("\n");
+                if(nIndex != -1){
+                    nationality = nationality.substring(0,nIndex);
+                }
+                nationality = nationality.replace("灰","汉");
+                result.put("nationality",filter(nationality));
+            }
+            String idCode = idCodeFilter(text);
+            if(!"".equals(idCode)){
+                result.put("gender",parseGender(idCode));
+                String year = idCode.substring(6,10);
+                String month = idCode.substring(10,12);
+                String day = idCode.substring(12,14);
+                result.put("year",year);
+                result.put("month",month);
+                result.put("day",day);
+                result.put("idCode",idCode);
+            }
+            if((text.contains("省") || text.contains("市") || text.contains("区")) && text.length() > 10){
+                String address = text;
+                String[] addressArray = address.split("\n");
+                address = address.replace("\n","");
+                if(addressArray[0].contains("住") || addressArray[0].contains("址")){
+                    addressArray[0] = addressArray[0].replace("住","");
+                    addressArray[0] = addressArray[0].replace("址","");
+                }
+                if(addressArray.length >= 3){
+                    address = addressArray[0] + addressArray[1] + addressArray[2];
+                }else{
+                    address = addressArray[0] + addressArray[1];
+                }
+                result.put("address",filter(address));
+            }
+        }
+
         return result;
 	}
-	
+
+	public static String idCodeFilter(String text){
+	    String temp = text;
+        temp = temp.replace(" ", "");
+        temp = temp.replace("o", "0");
+        temp = temp.replace("O", "0");
+        temp = temp.replace("l", "1");
+        temp = temp.replace("]", "1");
+        temp = temp.replace("】", "1");
+        temp = temp.replace("?", "7");
+        temp = temp.replace("了", "7");
+        temp = temp.replace("B", "8");
+        String code = "";
+        char[] textArray = temp.toCharArray();
+        for(char c : textArray){
+            //是否为数字
+            boolean isDigit = Character.isDigit(c);
+            //后面是否为连续
+            if((isDigit || String.valueOf(c).toLowerCase().equals("x")) && code.length() < 18){
+                code += c;
+                if(code.length() == 18){
+                    break;
+                }
+            }else{
+                code = "";
+            }
+        }
+        return code;
+    }
+
+    public static String parseGender(String idCode){
+	    String gender = "";
+	    String s = idCode.substring(16,17);
+	    int i = Integer.parseInt(s);
+	    if(i % 2 == 0){
+	        gender = "女";
+        }else{
+	        gender = "男";
+        }
+        return gender;
+    }
+
+    public static String filter(String text){
+        String s = " _-＿－ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
+        char[] sArray = s.toCharArray();
+        for(char c : sArray){
+            text = text.replace(String.valueOf(c),"");
+        }
+        return text;
+    }
+
 	/**
 	 * 排序
 	 * @param contours
@@ -407,9 +527,9 @@ public class ImgUtil {
                 tg = (inPixels[index] >> 8) & 0xff;
                 tb = inPixels[index] & 0xff;
                 if (tr > means) {
-                    tr = tg = tb = 255;//黑
+                    tr = tg = tb = 255;//白
                 } else {
-                    tr = tg = tb = 0;//白
+                    tr = tg = tb = 0;//黑
                 }
                 outPixels[index] = (ta << 24) | (tr << 16) | (tg << 8) | tb;
             }

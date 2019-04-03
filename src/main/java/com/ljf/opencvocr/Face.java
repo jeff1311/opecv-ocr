@@ -56,9 +56,9 @@ public class Face {
 		// 5 把人像区域置为白色
 		// 根据人脸检测得到的矩形位置算出大概人像区域
 		int x1 = (int) (faceRect.x - faceRect.width / 3.5);
-		int y1 = (int) (faceRect.y - faceRect.height / 2.0);
+		int y1 = (int) (faceRect.y - faceRect.height / 1.8);
 		int w1 = (int) (x1 + faceRect.width * 1.6);
-		int h1 = (int) (y1 + faceRect.height * 2.0);
+		int h1 = (int) (y1 + faceRect.height * 2.1);
 		Point point3 = new Point(x1, y1);
 		Point point4 = new Point(w1, h1);
 		Rect f = new Rect(point3,point4);

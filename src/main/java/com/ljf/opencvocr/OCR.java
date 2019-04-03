@@ -1,5 +1,6 @@
 package com.ljf.opencvocr;
 
+import com.alibaba.fastjson.JSONObject;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -22,7 +23,7 @@ public class OCR {
 		System.load(opencvLib);
 	}
 
-	public static String execute(String imgPath,boolean show){
+	public static JSONObject execute(String imgPath, boolean show){
 		//读取图像
 		//根据人脸识别裁剪身份证以内的区域
 		Mat src = Face.idcardCrop(imgPath,true);
@@ -53,7 +54,7 @@ public class OCR {
 		Imgproc.dilate(gray, gray, kernel, new Point(-1, -1), 28);//以这个内核为中心膨胀N倍
 		//保存图片（测试）
 		Imgcodecs.imwrite("E:/ocr/test/" + new Date().getTime() + ".jpg", gray);
-		String result = ImgUtil.findContours(gray,src);
+		JSONObject result = ImgUtil.findContours(gray,src);
 		return result;
 	}
 
