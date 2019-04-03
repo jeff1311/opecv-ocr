@@ -52,7 +52,7 @@
     </dependencies>
 
     <build>
-        <finalName>ljf-ocr</finalName>
+        <finalName>ljf-opencvocr</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -96,7 +96,7 @@
                 <configuration>
                     <!-- 指定web.xml的路径  -->
                     <webXml>web\WEB-INF\web.xml</webXml>
-                    <!-- 指定jsp、js、css的路劲 -->
+                    <!-- 指定jsp、js、css的路径 -->
                     <warSourceDirectory>web</warSourceDirectory>
                 </configuration>
             </plugin>
