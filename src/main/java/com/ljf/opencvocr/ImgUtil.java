@@ -211,7 +211,7 @@ public class ImgUtil {
             }
             if((text.contains("省") || text.contains("市") ||
                     text.contains("区") || text.contains("县") ||
-                    text.contains("乡") || text.contains("镇")) && text.length() > 10){
+                    text.contains("乡") || text.contains("镇")) && text.length() > 12){
                 String address = text;
                 address = address.replace(" ","");
                 int aIndex = 0;
