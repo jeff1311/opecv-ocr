@@ -51,7 +51,9 @@ public class OCR {
 		Imgcodecs.imwrite("E:/ocr/test/" + new Date().getTime() + ".jpg", binary);
 		//膨胀（白色膨胀）
 		Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(3,3));//使用3*3交叉内核
-		Imgproc.dilate(gray, gray, kernel, new Point(-1, -1), 28);//以这个内核为中心膨胀N倍
+		Imgproc.dilate(gray, gray, kernel, new Point(-1, -1), 30);//以这个内核为中心膨胀N倍
+		//腐蚀（黑色膨胀）
+//		Imgproc.erode(gray, gray, kernel, new Point(-1, -1), 15);
 		//保存图片（测试）
 		Imgcodecs.imwrite("E:/ocr/test/" + new Date().getTime() + ".jpg", gray);
 		JSONObject result = ImgUtil.findContours(gray,src);

@@ -146,7 +146,7 @@ public class ImgUtil {
             String storagePath = "E:/ocr/test/block/" + i + ".jpg";
             Imgcodecs.imwrite(storagePath, tmpImg);
             System.out.println(rect.area());
-            if(rect.area() > 10000){
+            if(rect.area() > 8000){
                 resultStr = resultStr + ocr(storagePath) + "<br>";
 //                resultStr = resultStr.replace("\n","<br>");
             }
@@ -195,6 +195,13 @@ public class ImgUtil {
                 nationality = nationality.replace("灰","汉");
                 nationality = nationality.replace("况","汉");
                 result.put("nationality",filter(nationality));
+            }else if(i == 2 && !text.contains("族") && text.length() < 5){
+                for(String n : Constants.NATIONS){
+                    if(text.contains(n)){
+                        result.put("nationality",n);
+                        break;
+                    }
+                }
             }
             String idCode = idCodeFilter(text);
             if(!"".equals(idCode)){
