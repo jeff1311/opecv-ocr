@@ -31,9 +31,28 @@ public class Face {
 		CascadeClassifier facebook = new CascadeClassifier(faceXmlPath);
 		// 2 读取测试图片
 		Mat image = Imgcodecs.imread(imgPath);
-		// 3 特征匹配
+
+		// 3 修改尺寸
+		Size size = null;
+		if(image.width() > image.height()){
+			if(image.width() > 2000){
+				int width = 2000;
+				int height = width * image.height() / image.width();
+				size = new Size(width, height);
+				Imgproc.resize(image, image, size);
+			}
+		}else{
+			if(image.height() > 2000){
+				int height = 2000;
+				int width = height * image.width() / image.height();
+				size = new Size(width, height);
+				Imgproc.resize(image, image, size);
+			}
+		}
+
+		// 4 特征匹配
 		Rect[] faces = autoRotate(image, facebook);
-		// 4 算出身份证区域并裁图
+		// 5 算出身份证区域并裁图
 		int maxIndex = 0;
 		if(faces.length > 1){
 			double maxArea = 0d;
@@ -46,7 +65,7 @@ public class Face {
 		}
 		Rect faceRect = faces[maxIndex];
 
-		// 5 把人像区域置为白色
+		// 6 把人像区域置为白色
 		// 根据人脸检测得到的矩形位置算出大概人像区域
 		int x1 = (int) (faceRect.x - faceRect.width / 3.8);
 		int y1 = (int) (faceRect.y - faceRect.height / 1.8);
@@ -86,11 +105,11 @@ public class Face {
 //			}
 //		}
 
-		// 6 修改尺寸
+		// 7 修改尺寸
 		int width = 1200;
 		int height = width * crop.height() / crop.width();
-		Size size = new Size(width, height);
-		Imgproc.resize(crop, crop, size);
+		Size cropSize = new Size(width, height);
+		Imgproc.resize(crop, crop, cropSize);
 
 		// 保存图片
 		if(test){
@@ -183,18 +202,18 @@ public class Face {
 //					Point point2 = new Point(w, h);
 //					Scalar scalar = new Scalar(0, 255, 0);
 //					Imgproc.rectangle(src, point1, point2, scalar);
-					
+//					Imgcodecs.imwrite("E:/ocr/test/face.jpg", src);
+
 					System.out.println(f.area());
 					if(maxArea < f.area()){
 						maxArea = f.area();
 					}
 				}
-				if(maxArea > 18000 && maxArea < 150000){
+				if(maxArea > 40000 && maxArea < 200000){
 					hasface = true;
 				}
 			}
 		}
-//		Imgcodecs.imwrite("E:/ocr/test/face.jpg", src);
 		return faces;
 	}
 

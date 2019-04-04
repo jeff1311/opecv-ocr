@@ -172,11 +172,13 @@ public class ImgUtil {
                         name = name.substring(0,nIndex);
                     }
                 }else{
-                    int nIndex = name.indexOf("\n");
-                    if(nIndex != -1){
-                        name = name.substring(0,nIndex);
+                    if(name.split("\n").length > 2){
+                        int nIndex = name.indexOf("\n");
+                        if(nIndex != -1){
+                            name = name.substring(0,nIndex);
+                        }
                     }else{
-                        name = name;
+                        name = name.replace("\n","");
                     }
                 }
                 result.put("name",nameFilter(filter(name)));
@@ -191,6 +193,7 @@ public class ImgUtil {
                 }
                 nationality = nationality.replace("汊","汉");
                 nationality = nationality.replace("灰","汉");
+                nationality = nationality.replace("况","汉");
                 result.put("nationality",filter(nationality));
             }
             String idCode = idCodeFilter(text);
@@ -206,7 +209,9 @@ public class ImgUtil {
                 result.put("day",d == 0 ? day.toCharArray()[1] : day);
                 result.put("idCode",idCode);
             }
-            if((text.contains("省") || text.contains("市") || text.contains("区") || text.contains("县")) && text.length() > 10){
+            if((text.contains("省") || text.contains("市") ||
+                    text.contains("区") || text.contains("县") ||
+                    text.contains("乡") || text.contains("镇")) && text.length() > 10){
                 String address = text;
                 address = address.replace(" ","");
                 int aIndex = 0;
@@ -239,15 +244,15 @@ public class ImgUtil {
 	//取出身份证号
 	public static String idCodeFilter(String text){
 	    String temp = text;
-        temp = temp.replace(" ", "");
-        temp = temp.replace("o", "0");
-        temp = temp.replace("O", "0");
-        temp = temp.replace("l", "1");
-        temp = temp.replace("]", "1");
-        temp = temp.replace("】", "1");
-        temp = temp.replace("?", "7");
-        temp = temp.replace("了", "7");
-        temp = temp.replace("B", "8");
+        temp = temp.replace(" ", "").
+                replace("o", "0").
+                replace("O", "0").
+                replace("l", "1").
+                replace("]", "1").
+                replace("】", "1").
+                replace("?", "7").
+                replace("了", "7").
+                replace("B", "8");
         String code = "";
         char[] textArray = temp.toCharArray();
         for(char c : textArray){
@@ -281,7 +286,7 @@ public class ImgUtil {
 
     //过滤特殊字符
     public static String filter(String text){
-        String s = " ′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
+        String s = " ]】\"〕′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
         char[] sArray = s.toCharArray();
         for(char c : sArray){
             text = text.replace(String.valueOf(c),"");
