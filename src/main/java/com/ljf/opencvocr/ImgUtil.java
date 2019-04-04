@@ -286,7 +286,7 @@ public class ImgUtil {
 
     //过滤特殊字符
     public static String filter(String text){
-        String s = " ]】\"〕′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
+        String s = " |]】\"〕′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
         char[] sArray = s.toCharArray();
         for(char c : sArray){
             text = text.replace(String.valueOf(c),"");
