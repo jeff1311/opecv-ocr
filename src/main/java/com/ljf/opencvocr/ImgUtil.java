@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 图片工具栏
+ * 图片工具类
  * @author ljf
  * @since 2019-03-14
  */
@@ -140,13 +140,14 @@ public class ImgUtil {
 //            Scalar scalar = new Scalar(255, 0, 255);
 //            Imgproc.rectangle(src,point1,point2,scalar);
 
-            Mat srcImg = new Mat(src, rect);
-            Mat tmpImg = new Mat();
-            srcImg.copyTo(tmpImg);
-            String storagePath = "E:/ocr/test/block/" + i + ".jpg";
-            Imgcodecs.imwrite(storagePath, tmpImg);
-            System.out.println(rect.area());
             if(rect.area() > 8000){
+                Mat srcImg = new Mat(src, rect);
+                Mat tmpImg = new Mat();
+                srcImg.copyTo(tmpImg);
+                String storagePath = "E:/ocr/test/block/" + i + ".jpg";
+                Imgcodecs.imwrite(storagePath, tmpImg);
+                System.out.println(rect.area());
+
                 resultStr = resultStr + ocr(storagePath) + "<br>";
 //                resultStr = resultStr.replace("\n","<br>");
             }
@@ -184,18 +185,24 @@ public class ImgUtil {
                 result.put("name",nameFilter(filter(name)));
             }
             if(text.contains("族")){
-                String nationality = text;
-                int index = nationality.indexOf("族");
-                nationality = nationality.substring(index + 1);
-                int nIndex = nationality.indexOf("\n");
-                if(nIndex != -1){
-                    nationality = nationality.substring(0,nIndex);
+//                String nationality = text;
+//                int index = nationality.indexOf("族");
+//                nationality = nationality.substring(index + 1);
+//                int nIndex = nationality.indexOf("\n");
+//                if(nIndex != -1){
+//                    nationality = nationality.substring(0,nIndex);
+//                }
+//                nationality = nationality.replace("汊","汉");
+//                nationality = nationality.replace("灰","汉");
+//                nationality = nationality.replace("况","汉");
+                for(String n : Constants.NATIONS){
+                    if(text.contains(n)){
+                        result.put("nationality",n);
+                        break;
+                    }
                 }
-                nationality = nationality.replace("汊","汉");
-                nationality = nationality.replace("灰","汉");
-                nationality = nationality.replace("况","汉");
-                result.put("nationality",filter(nationality));
-            }else if(i == 2 && !text.contains("族") && text.length() < 5){
+//                result.put("nationality",filter(nationality));
+            }else if(i > 0 && i < 3 && !text.contains("族") && text.length() < 5){
                 for(String n : Constants.NATIONS){
                     if(text.contains(n)){
                         result.put("nationality",n);
@@ -293,7 +300,7 @@ public class ImgUtil {
 
     //过滤特殊字符
     public static String filter(String text){
-        String s = " （）()|]】\"〕′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
+        String s = " （）()|[]】\"〕′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
         char[] sArray = s.toCharArray();
         for(char c : sArray){
             text = text.replace(String.valueOf(c),"");
@@ -318,14 +325,14 @@ public class ImgUtil {
 	 * @return
 	 */
 	public static List<MatOfPoint> sortMat(ArrayList<MatOfPoint> contours){
-		for(int a = 0;a < contours.size();a ++){
-			Rect rect1 = Imgproc.boundingRect(contours.get(a));
-			for(int b = 0;b < contours.size();b ++){
-				Rect rect2 = Imgproc.boundingRect(contours.get(b));
+		for(int a = 0;a < contours.size() - 1;a ++){
+			for(int b = 0;b < contours.size() - a - 1;b ++){
+                Rect rect1 = Imgproc.boundingRect(contours.get(b + 1));
+                Rect rect2 = Imgproc.boundingRect(contours.get(b));
 				if(sort(rect1,rect2)){
-					MatOfPoint temp = contours.get(a);
-					contours.set(a, contours.get(b));
-					contours.set(b, temp);
+					MatOfPoint temp = contours.get(b);
+					contours.set(b, contours.get(b + 1));
+					contours.set(b + 1, temp);
 				}
 			}
 		}
@@ -336,7 +343,7 @@ public class ImgUtil {
 	 * 排序规则
 	 * @param a
 	 * @param b
-	 * @return
+     * @return
 	 */
 	public static boolean sort(Rect a,Rect b){
 		if(a.y < b.y){

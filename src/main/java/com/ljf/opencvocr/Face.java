@@ -33,22 +33,22 @@ public class Face {
 		Mat image = Imgcodecs.imread(imgPath);
 
 		// 3 修改尺寸
-		Size size = null;
-		if(image.width() > image.height()){
-			if(image.width() > 2000){
-				int width = 2000;
-				int height = width * image.height() / image.width();
-				size = new Size(width, height);
-				Imgproc.resize(image, image, size);
-			}
-		}else{
-			if(image.height() > 2000){
-				int height = 2000;
-				int width = height * image.width() / image.height();
-				size = new Size(width, height);
-				Imgproc.resize(image, image, size);
-			}
-		}
+//		Size size = null;
+//		if(image.width() > image.height()){
+//			if(image.width() > 2000){
+//				int width = 2000;
+//				int height = width * image.height() / image.width();
+//				size = new Size(width, height);
+//				Imgproc.resize(image, image, size);
+//			}
+//		}else{
+//			if(image.height() > 2000){
+//				int height = 2000;
+//				int width = height * image.width() / image.height();
+//				size = new Size(width, height);
+//				Imgproc.resize(image, image, size);
+//			}
+//		}
 
 		// 4 特征匹配
 		Rect[] faces = autoRotate(image, facebook);
