@@ -221,7 +221,7 @@ public class ImgUtil {
                 int d = Integer.parseInt(day.substring(0,1));
                 result.put("month",m == 0 ? month.toCharArray()[1] : month);
                 result.put("day",d == 0 ? day.toCharArray()[1] : day);
-                result.put("idCode",idCode);
+                result.put("idCode",idCode.replace("x","X"));
             }
             if((text.contains("省") || text.contains("市") ||
                     text.contains("区") || text.contains("县") ||

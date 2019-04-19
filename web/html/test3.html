@@ -4,17 +4,166 @@
 <meta charset="UTF-8">
 <title>OCR</title>
 <style type="text/css">
-.main{
-	margin:0 auto;
-	margin-top:100px;
-	width:500px;
-}
-#img{
-	display:none;
-}
-#view{
-	width:500px;
-}
+	*{
+		font-family: "黑体";
+		font-weight: bold;
+		color:#555555;
+	}
+	body{
+		background-color: #ffffff;
+	}
+	.main{
+		margin:0 auto;
+		margin-top:100px;
+		width:500px;
+	}
+	#img{
+		display:none;
+	}
+	#view{
+		width:500px;
+	}
+	.idCard{
+		width: 500px;
+		height: 300px;
+		/*border: 1px solid grey;*/
+		border-radius: 15px;
+		background-color: #fbfbfb;
+		box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+		overflow: hidden;
+		-webkit-transition: all 1s ease 0s;
+		-moz-transition: all 1s ease 0s;
+		-ms-transition: all 1s ease 0s;
+		-o-transition: all 1s ease 0s;
+		transition: all 1s ease 0s;
+	}
+	.idCard:hover{
+		box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+	}
+	.name .n,.gender-nation .n,.birth .n,.address .n{
+		/*margin-right:20px;*/
+		/*display:inline-block;*/
+		float:left;
+		color:#63B8FF;
+		font-size:small;
+		letter-spacing:10px;
+		width:55px;
+		height:37px;
+		line-height:37px;
+		overflow: hidden;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+	.code{
+		float:left;
+		margin-top:10px;
+		margin-left:30px;
+		/*border:1px solid green;*/
+		width:440px;
+		height:37px;
+		line-height:37px;
+	}
+	.code .n{
+		float:left;
+		color:#63B8FF;
+		font-size:15px;
+		letter-spacing:3px;
+		width:150px;
+		height:37px;
+		line-height:37px;
+		overflow: hidden;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+	.code .v{
+		font-size: 18px;
+		letter-spacing:5px;
+	}
+	.n-y,.n-m,.n-d{
+		float:left;
+		color:#63B8FF;
+		font-size:small;
+		/*letter-spacing:10px;*/
+		width:10px;
+		height:37px;
+		line-height:37px;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+	.v-y{
+		float:left;
+		width:50px;
+		height:37px;
+		line-height:37px;
+	}
+	.v-m,.v-d{
+		float:left;
+		width:40px;
+		height:37px;
+		line-height:37px;
+		text-align: center;
+	}
+	.text{
+		float:left;
+		margin-top:30px;
+		margin-left:30px;
+		/*border:1px solid green;*/
+		width:280px;
+		height:200px;
+	}
+	.name,.gender-nation,.birth{
+		float:left;
+		width:100%;
+		height:37px;
+		line-height:37px;
+		/*border:1px solid green;*/
+	}
+	.address{
+		float:left;
+		width:100%;
+		height:87px;
+		line-height:33px;
+		/*border:1px solid green;*/
+	}
+	.name .v{
+		float:left;
+		width:80px;
+		height:37px;
+		line-height:33px;
+		letter-spacing:3px;
+		font-size: larger;
+	}
+	.gender-nation .v{
+		float:left;
+		width:50px;
+		height:37px;
+		line-height:37px;
+		letter-spacing:3px;
+	}
+	.birth .v{
+		float:left;
+		width:50px;
+		height:37px;
+		line-height:37px;
+	}
+	.address .v{
+		margin-top:7px;
+		float:left;
+		width:222px;
+		height:87px;
+		line-height:25px;
+		/*border:1px solid green;*/
+		letter-spacing:3px;
+	}
+	.img{
+		margin-top:45px;
+		margin-left:10px;
+		float:left;
+		width:148px;
+		height:185px;
+		/*border:1px solid green;*/
+	}
+
 </style>
 </head>
 <body>
@@ -23,15 +172,32 @@
 	<input type="file" id="img">
 	<button id="select">选择图片</button>
 	<img id="view">
-	姓名：<span id="name"></span>
-	<br><br>
-	性别：<span id="gender"></span>&nbsp;民族：<span id="nationality"></span>
-	<br><br>
-	出生：<span id="year"></span>&nbsp;年&nbsp;<span id="month"></span>&nbsp;月&nbsp;<span id="day"></span>&nbsp;日
-	<br><br>
-	住址：<span id="address"></span>
-	<br><br>
-	公民身份证号码：<span id="idCode"></span>
+
+	<div class="idCard">
+		<div class="text">
+			<div class="name">
+				<div class="n">姓名</div><div class="v" id="name"></div>
+			</div>
+			<div class="gender-nation">
+				<div class="n">性别</div><div class="v" id="gender"></div>
+				<div class="n">民族</div><div class="v" id="nation"></div>
+			</div>
+			<div class="birth">
+				<div class="n">出生</div>
+				<div class="v-y" id="year"></div><div class="n-y">年</div>
+				<div class="v-m" id="month"></div><div class="n-m">月</div>
+				<div class="v-d" id="day"></div><div class="n-d">日</div>
+			</div>
+			<div class="address">
+				<div class="n">住址</div><div class="v" id="address"></div>
+			</div>
+		</div>
+		<div class="img"></div>
+		<div class="code">
+			<div class="n">公民身份证号码</div><div class="v" id="idCode"></div>
+		</div>
+	</div>
+
 </div>
 
 </body>
@@ -76,7 +242,7 @@ function ocr(file){
             var ocrInfo = json.ocrInfo;
             $('#name').text(ocrInfo.name);
             $('#gender').text(ocrInfo.gender);
-            $('#nationality').text(ocrInfo.nationality);
+            $('#nation').text(ocrInfo.nationality);
             $('#year').text(ocrInfo.year);
             $('#month').text(ocrInfo.month);
             $('#day').text(ocrInfo.day);

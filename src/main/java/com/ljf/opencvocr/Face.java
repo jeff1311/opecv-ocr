@@ -147,7 +147,7 @@ public class Face {
         }
 		Imgproc.resize(image, image, size);
 		// 4 特征匹配
-		Rect[] faces = autoRotate(image, facebook);
+		Rect[] faces = autoRotate2(image, facebook);
 
 		// 5 为每张识别到的人脸画一个圈
 		for (int i = 0; i < faces.length; i++) {
@@ -210,6 +210,57 @@ public class Face {
 					}
 				}
 				if(maxArea > 40000 && maxArea < 200000){
+					hasface = true;
+				}
+			}
+		}
+		return faces;
+	}
+
+	/**
+	 * 特征匹配&自动旋转
+	 * @param src
+	 * @param facebook
+	 * @return
+	 */
+	public static Rect[] autoRotate2(Mat src,CascadeClassifier facebook){
+		MatOfRect face = new MatOfRect();
+		Rect[] faces = null;
+		boolean hasface = false;
+		int times = 0;
+		while(!hasface && times < 3){
+			times ++;
+			if(times == 2){
+				// 向左旋转90度
+				rotateLeft(src);
+			}else if(times == 3){
+				// 向右旋转180度
+				rotateRight(src);
+				rotateRight(src);
+			}
+			facebook.detectMultiScale(src, face);
+			// 匹配 Rect 矩阵 数组
+			faces = face.toArray();
+			System.out.println("匹配到 " + faces.length + " 个人脸");
+			if(faces.length > 0){
+				double maxArea = 0d;
+				for(Rect f : faces){
+//					int x = f.x;
+//					int y = f.y;
+//					int w = x + f.width;
+//					int h = y + f.height;
+//					Point point1 = new Point(x, y);
+//					Point point2 = new Point(w, h);
+//					Scalar scalar = new Scalar(0, 255, 0);
+//					Imgproc.rectangle(src, point1, point2, scalar);
+//					Imgcodecs.imwrite("E:/ocr/test/face.jpg", src);
+
+					System.out.println(f.area());
+					if(maxArea < f.area()){
+						maxArea = f.area();
+					}
+				}
+				if(maxArea > 1000){
 					hasface = true;
 				}
 			}

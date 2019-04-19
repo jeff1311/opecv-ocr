@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class Upload {
 
-	private static Logger logger = LoggerFactory.getLogger("util");
+	private static Logger logger = LoggerFactory.getLogger("upload");
 
 	public static Model getInfo(HttpServletRequest request){
 		// 从页面中拿取数据，因为上传页的编码格式跟一般的不同，使用的是enctype="multipart/form-data"
