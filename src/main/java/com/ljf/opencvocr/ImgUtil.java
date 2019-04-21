@@ -163,6 +163,19 @@ public class ImgUtil {
         Imgcodecs.imwrite(storagePath, src);
 
         //筛选有用信息
+
+        //过滤掉前面不是名字的无用信息
+        boolean flag = false;
+        while(!flag){
+            String f = resultStr.substring(0,resultStr.indexOf("<br>"));
+            if("".equals(nameFilter(f)) || nameFilter(f).length() < 2){
+                resultStr = resultStr.substring(resultStr.indexOf("<br>") + 4);
+            }else{
+                flag = true;
+                break;
+            }
+        }
+
         String[] resultArray = resultStr.split("<br>");
 
         for(int i = 0;i < resultArray.length;i ++){
@@ -189,29 +202,27 @@ public class ImgUtil {
                 name = name.replace("-","");
                 result.put("name",nameFilter(filter(name)));
             }
-            if(text.contains("族")){
-//                String nationality = text;
-//                int index = nationality.indexOf("族");
-//                nationality = nationality.substring(index + 1);
-//                int nIndex = nationality.indexOf("\n");
+//            if(text.contains("族")){
+//                String nation = text;
+//                int index = nation.indexOf("族");
+//                nation = nation.substring(index + 1);
+//                int nIndex = nation.indexOf("\n");
 //                if(nIndex != -1){
-//                    nationality = nationality.substring(0,nIndex);
+//                    nation = nation.substring(0,nIndex);
 //                }
-//                nationality = nationality.replace("汊","汉");
-//                nationality = nationality.replace("灰","汉");
-//                nationality = nationality.replace("况","汉");
-                for(String n : Constants.NATIONS){
-                    if(text.contains(n)){
-                        result.put("nationality",n);
-                        break;
-                    }
-                }
-//                result.put("nationality",filter(nationality));
-            }else if(i > 0 && i < 3 && !text.contains("族") && text.length() < 5){
-                for(String n : Constants.NATIONS){
-                    if(text.contains(n)){
-                        result.put("nationality",n);
-                        break;
+//                result.put("nation",filter(nation));
+//            }
+            if(resultArray.length < 5 || (i > 0 && i <= 4)){
+                if(result.get("nation") == null){
+                    String nation = text;
+                    nation = nation.replace(" ","");
+                    nation = nation.replace("汊","汉");
+                    nation = nation.replace("况","汉");
+                    for(String n : Constants.NATIONS){
+                        if(nation.contains(n)){
+                            result.put("nation",n);
+                            break;
+                        }
                     }
                 }
             }
@@ -321,7 +332,7 @@ public class ImgUtil {
                 name = name.replace(String.valueOf(c),"");
             }
         }
-        return name;
+        return name.trim();
     }
 
 	/**

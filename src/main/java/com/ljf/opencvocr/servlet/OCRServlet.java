@@ -30,7 +30,7 @@ public class OCRServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        Util.clearFiles("D:/ocr/test");
+        Util.clearFiles("D:/ocr/test");
         Model uploadInfo = Upload.getInfo(req);
         Map<String, String> params = uploadInfo.getParams();
         String storagePath = params.get("storagePath");

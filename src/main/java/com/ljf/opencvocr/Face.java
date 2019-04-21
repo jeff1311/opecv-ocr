@@ -87,7 +87,7 @@ public class Face {
 		int x0 = (int) (faceRect.x - faceRect.width * 2.8);
 		int y0 = (int) (faceRect.y - faceRect.height / 1.6);
 		int w0 = (int) (x0 + faceRect.width * 4.2);
-		int h0 = (int) (y0 + faceRect.height * 2.8);
+		int h0 = (int) (y0 + faceRect.height * 2.9);
 		Point point1 = new Point(x0, y0);
 		Point point2 = new Point(w0, h0);
 		Rect rect = new Rect(point1,point2);
