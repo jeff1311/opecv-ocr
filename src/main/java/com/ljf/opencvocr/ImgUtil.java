@@ -127,6 +127,8 @@ public class ImgUtil {
 		Mat hierarchy = new Mat();
 		Imgproc.findContours(srcDilate, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 		List<MatOfPoint> sortMat = sortMat(contours);
+		//清空文件夹
+        Util.clearFiles("D:/ocr/test/binary");
 		for(int i = 0;i < sortMat.size();i ++){
         	Rect rect = Imgproc.boundingRect(sortMat.get(i));
 
@@ -144,7 +146,8 @@ public class ImgUtil {
                 Mat srcImg = new Mat(src, rect);
                 Mat tmpImg = new Mat();
                 srcImg.copyTo(tmpImg);
-                String storagePath = "E:/ocr/test/block/" + i + ".jpg";
+                String storagePath = "D:/ocr/test/block/" + i + ".jpg";
+                Util.mkDirs(storagePath);
                 Imgcodecs.imwrite(storagePath, tmpImg);
                 System.out.println(rect.area());
 
@@ -155,7 +158,8 @@ public class ImgUtil {
 
         System.out.println(resultStr);
 
-        String storagePath = "E:/ocr/test/src.jpg";
+        String storagePath = "D:/ocr/test/src.jpg";
+        Util.mkDirs(storagePath);
         Imgcodecs.imwrite(storagePath, src);
 
         //筛选有用信息
@@ -182,6 +186,7 @@ public class ImgUtil {
                         name = name.replace("\n","");
                     }
                 }
+                name = name.replace("-","");
                 result.put("name",nameFilter(filter(name)));
             }
             if(text.contains("族")){
@@ -685,7 +690,7 @@ public class ImgUtil {
                 }
             }
 
-            Imgcodecs.imwrite("E:/ocr/test/binary/" + new Date().getTime() + ".jpg",src);
+            Imgcodecs.imwrite(Util.mkDirs("D:/ocr/test/binary/" + new Date().getTime() + ".jpg"),src);
             BufferedImage binary = Mat2BufImg(src, ".jpg");
 
 //        	BufferedImage src = ImageIO.read(file);

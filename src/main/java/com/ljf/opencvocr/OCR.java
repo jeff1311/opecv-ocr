@@ -18,7 +18,7 @@ import java.util.Date;
 public class OCR {
 
 	static {
-		//载入本地库
+		//载入opencv库
 		String opencvLib = Util.getClassPath() + "opencv/dll/opencv_java320.dll";
 		System.load(opencvLib);
 	}
@@ -35,27 +35,21 @@ public class OCR {
 		int constValue = 50;
 		Imgproc.adaptiveThreshold(gray, gray, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, blockSize, constValue);
 		//保存图片（测试）
-		Imgcodecs.imwrite("E:/ocr/test/" + new Date().getTime() + ".jpg", gray);
+		Imgcodecs.imwrite(Util.mkDirs("D:/ocr/test/" + new Date().getTime() + ".jpg"), gray);
 		//过滤杂纹
 	    Imgproc.medianBlur(gray, gray,3);
-		//腐蚀（黑色膨胀）
-//	    Mat kernel2 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(3,3));//使用3*3交叉内核
-//	    Imgproc.erode(gray, gray, kernel2, new Point(-1, -1), 1);//以这个内核为中心膨胀N倍
-//	    //膨胀（白色膨胀）
-//	    Mat kerne3 = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(3,3));//使用3*3交叉内核
-//		Imgproc.dilate(gray, gray, kerne3, new Point(-1, -1), 1);//以这个内核为中心膨胀N倍
-		Mat binary = gray.clone();
-		//二值图像反色
-		Core.bitwise_not(binary, binary);
-		//保存图片（测试）
-		Imgcodecs.imwrite("E:/ocr/test/" + new Date().getTime() + ".jpg", binary);
+//		Mat binary = gray.clone();
+//		//二值图像反色
+//		Core.bitwise_not(binary, binary);
+//		//保存图片（测试）
+//		Imgcodecs.imwrite(Util.mkDirs("D:/ocr/test/" + new Date().getTime() + ".jpg"), binary);
 		//膨胀（白色膨胀）
 		Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(3,3));//使用3*3交叉内核
-		Imgproc.dilate(gray, gray, kernel, new Point(-1, -1), 30);//以这个内核为中心膨胀N倍
+		Imgproc.dilate(gray, gray, kernel, new Point(-1, -1), 28);//以这个内核为中心膨胀N倍
 		//腐蚀（黑色膨胀）
 //		Imgproc.erode(gray, gray, kernel, new Point(-1, -1), 15);
 		//保存图片（测试）
-		Imgcodecs.imwrite("E:/ocr/test/" + new Date().getTime() + ".jpg", gray);
+		Imgcodecs.imwrite(Util.mkDirs(Util.mkDirs("D:/ocr/test/" + new Date().getTime() + ".jpg")), gray);
 		JSONObject result = ImgUtil.findContours(gray,src);
 		return result;
 	}

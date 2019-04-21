@@ -41,4 +41,31 @@ public class Util {
         return rootPath;
     }
 
+    /**创建文件，文件夹不存在自动创建*/
+    public static File mkFile(String path){
+        String dirs = path.substring(0,path.lastIndexOf("/"));
+        File f = new File(dirs);
+        if(!f.exists()){
+            f.mkdirs();
+        }
+        return new File(path);
+    }
+
+    public static String mkDirs(String path){
+        String dirs = path.substring(0,path.lastIndexOf("/"));
+        File f = new File(dirs);
+        if(!f.exists()){
+            f.mkdirs();
+        }
+        return path;
+    }
+
+    public static void clearFiles(String path){
+        File b = new File(path);
+        File[] files = b.listFiles();
+        for(File f : files){
+            f.delete();
+        }
+    }
+
 }

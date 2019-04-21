@@ -33,22 +33,22 @@ public class Face {
 		Mat image = Imgcodecs.imread(imgPath);
 
 		// 3 修改尺寸
-//		Size size = null;
-//		if(image.width() > image.height()){
-//			if(image.width() > 2000){
-//				int width = 2000;
-//				int height = width * image.height() / image.width();
-//				size = new Size(width, height);
-//				Imgproc.resize(image, image, size);
-//			}
-//		}else{
-//			if(image.height() > 2000){
-//				int height = 2000;
-//				int width = height * image.width() / image.height();
-//				size = new Size(width, height);
-//				Imgproc.resize(image, image, size);
-//			}
-//		}
+		Size size = null;
+		if(image.width() > image.height()){
+			if(image.width() > 2000){
+				int width = 2000;
+				int height = width * image.height() / image.width();
+				size = new Size(width, height);
+				Imgproc.resize(image, image, size);
+			}
+		}else{
+			if(image.height() > 2000){
+				int height = 2000;
+				int width = height * image.width() / image.height();
+				size = new Size(width, height);
+				Imgproc.resize(image, image, size);
+			}
+		}
 
 		// 4 特征匹配
 		Rect[] faces = autoRotate(image, facebook);
@@ -85,9 +85,9 @@ public class Face {
 		}
 
 		int x0 = (int) (faceRect.x - faceRect.width * 2.8);
-		int y0 = (int) (faceRect.y - faceRect.height / 1.7);
+		int y0 = (int) (faceRect.y - faceRect.height / 1.6);
 		int w0 = (int) (x0 + faceRect.width * 4.2);
-		int h0 = (int) (y0 + faceRect.height * 2.7);
+		int h0 = (int) (y0 + faceRect.height * 2.8);
 		Point point1 = new Point(x0, y0);
 		Point point2 = new Point(w0, h0);
 		Rect rect = new Rect(point1,point2);
@@ -113,11 +113,13 @@ public class Face {
 
 		// 保存图片
 		if(test){
-			String storagePath = "E:/ocr/faceRect/crop/" + new Date().getTime() + ".jpg";
+			String storagePath = "D:/ocr/faceRect/crop/" + new Date().getTime() + ".jpg";
+			Util.mkDirs(storagePath);
 			Imgcodecs.imwrite(storagePath, crop);
 
-			String filename = "E:/ocr/faceRect/" + new Date().getTime() + ".jpg";
-			Imgcodecs.imwrite(filename, image);
+			String fileName = "D:/ocr/faceRect/" + new Date().getTime() + ".jpg";
+			Util.mkDirs(fileName);
+			Imgcodecs.imwrite(fileName, image);
 		}
 
 		return crop;
