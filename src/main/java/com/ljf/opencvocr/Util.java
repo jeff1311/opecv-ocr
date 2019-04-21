@@ -63,8 +63,10 @@ public class Util {
     public static void clearFiles(String path){
         File b = new File(path);
         File[] files = b.listFiles();
-        for(File f : files){
-            f.delete();
+        if(files != null && files.length > 0){        	
+        	for(File f : files){
+        		f.delete();
+        	}
         }
     }
 
