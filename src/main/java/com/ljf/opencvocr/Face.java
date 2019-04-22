@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Point;
@@ -109,10 +108,6 @@ public class Face {
 		Imgproc.resize(crop, crop, cropSize);
 		
 		Mat key = crop.clone();
-//		String storagePath1 = Constants.disk + "/ocr/test/" + new Date().getTime() + "a.jpg";
-//		Util.mkDirs(storagePath1);
-//		Imgcodecs.imwrite(storagePath1, blackFont);
-		
 		// 遍历剪裁区域像素，除黑字以外都变为灰色
 		double[] gray = {150,150,150};
 //		double[] black = {0,0,0};
