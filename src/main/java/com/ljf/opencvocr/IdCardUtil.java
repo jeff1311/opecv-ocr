@@ -102,7 +102,9 @@ public class IdCardUtil {
                 replace("】", "1").
                 replace("?", "7").
                 replace("了", "7").
-                replace("B", "8");
+                replace("B", "8").
+                replace("弓", "3").
+                replace("引", "3");
         String code = "";
         char[] textArray = temp.toCharArray();
         for(char c : textArray){
