@@ -33,13 +33,7 @@ public class OCR {
 		//二值化（自适应）
 		int blockSize = 25;
 		int threshold = 60;
-		Imgproc.adaptiveThreshold(gray, gray, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, blockSize, threshold);
-        //保存图片（测试）
-        Imgcodecs.imwrite(Util.mkDirs(Constants.disk + "/ocr/test/" + new Date().getTime() + ".jpg"), gray);
-        //去除小于36像素的区域
-//        OCRUtil.clean(gray,36);
-        //二值图像反色
-        Core.bitwise_not(gray, gray);
+		Imgproc.adaptiveThreshold(gray, gray, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, blockSize, threshold);
 		//保存图片（测试）
 		Imgcodecs.imwrite(Util.mkDirs(Constants.disk + "/ocr/test/" + new Date().getTime() + ".jpg"), gray);
 		//过滤杂纹

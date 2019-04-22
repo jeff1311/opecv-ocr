@@ -86,11 +86,23 @@ public class OCRUtil {
 
     public static JSONObject filterOcrInfo(String ocrInfo){
         ocrInfo = filter(ocrInfo);
+        ocrInfo = ocrInfo.replace("\n\n","\n");
         System.out.println(ocrInfo);
+
+        String[] array = ocrInfo.split("\n");
 
         JSONObject result = new JSONObject();
 
-        String[] array = ocrInfo.split("\n");
+        //找出身份证号码的那行
+        int idCodeIndex = 0;
+        for(int i = 0;i < array.length;i ++){
+            if(i > 4){
+                String idCode = idCodeFilter(array[i]);
+                if(!"".equals(idCode)){
+                    idCodeIndex = i;
+                }
+            }
+        }
 
         for(int i = 0;i < array.length;i ++){
             String text = array[i];
@@ -117,14 +129,19 @@ public class OCRUtil {
                     }
                 }
             }
-            if(i == 3){
+            if(i >= 3 && i < idCodeIndex){
                 String address = text;
-                address = address.replace(" ","");
                 int aIndex = address.indexOf("址");
                 if(aIndex != -1){
                     address = address.substring(aIndex + 1);
                 }
-                result.put("address",filter(address));
+                String addr = result.getString("address");
+                if(addr != null){
+                    addr += address;
+                    result.put("address",filter(addr));
+                }else{
+                    result.put("address",filter(address));
+                }
             }
 
             if(i > 4){
