@@ -102,8 +102,8 @@ public class Upload {
 //						File newFile = new File(baseSavePath);
 
 //						bi = ImageIO.read(fileItem.getInputStream());//图片泛红
-						byte[] byteArray = OCRUtil.toByteArray(fileItem.getInputStream());
-						bi = OCRUtil.toBufferedImage(byteArray);
+						byte[] byteArray = ImgUtil.toByteArray(fileItem.getInputStream());
+						bi = ImgUtil.toBufferedImage(byteArray);
 
 						// 7.删除临时文件
 						fileItem.delete();

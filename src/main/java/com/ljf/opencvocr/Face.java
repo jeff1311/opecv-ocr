@@ -1,11 +1,20 @@
 package com.ljf.opencvocr;
 
-import org.opencv.core.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
-
-import java.util.Date;
 
 /**
  * 面部识别
@@ -14,17 +23,17 @@ import java.util.Date;
  */
 public class Face {
 
-	static {
-		//载入本地库
-		String opencvLib = Util.getClassPath() + "opencv/dll/opencv_java320.dll";
-		System.load(opencvLib);
-	}
+//	static {
+//		//载入本地库
+//		String opencvLib = Util.getClassPath() + "opencv/dll/opencv_java320.dll";
+//		System.load(opencvLib);
+//	}
 
 	/**
 	 * 身份证正面裁剪（根据人脸识别）
 	 * @param imgPath
 	 */
-	public static Mat idcardCrop(String imgPath,boolean test){
+	public static Map<String,Mat> idcardCrop(String imgPath,boolean test){
 		//OpenCV 图像识别库一般位于 opencv\sources\data 下面
 		// 1 读取OpenCV自带的人脸识别特征XML文件
 		String faceXmlPath = Util.getClassPath() + "/opencv/xml/haarcascade_frontalface_alt.xml";
@@ -77,40 +86,50 @@ public class Face {
 		Mat mask = new Mat(image, f);
 
 		// 遍历roi区域像素，变为白色
-		for(int i = 0; i < mask.rows();i ++){
-			for( int j = 0; j < mask.cols();j ++){
+		for(int x = 0; x < mask.rows();x ++){
+			for( int y = 0; y < mask.cols();y ++){
 				double[] data = mask.get(0,0);
-				mask.put(i,j,data);
+				mask.put(x,y,data);
 			}
 		}
 
 		int x0 = (int) (faceRect.x - faceRect.width * 2.8);
-		int y0 = (int) (faceRect.y - faceRect.height / 1.5);
+		int y0 = (int) (faceRect.y - faceRect.height / 1.6);
 		int w0 = (int) (x0 + faceRect.width * 4.2);
-		int h0 = (int) (y0 + faceRect.height * 3.0);
+		int h0 = (int) (y0 + faceRect.height * 2.8);
 		Point point1 = new Point(x0, y0);
 		Point point2 = new Point(w0, h0);
 		Rect rect = new Rect(point1,point2);
 		Mat crop = new Mat(image, rect);
-
-
-		//遍历裁剪部分像素，只保留黑色
-//		for(int x = 0;x < crop.rows();x ++){
-//			for(int y = 0;y < crop.cols();y ++){
-//				double[] white = {255,255,255};
-//				double[] data = crop.get(x, y);
-//				if(data[0] > 100 && data[1] > 100 && data[2] > 100){
-//					crop.put(x,y,white);
-//				}
-//			}
-//		}
 
 		// 7 修改尺寸
 		int width = 1200;
 		int height = width * crop.height() / crop.width();
 		Size cropSize = new Size(width, height);
 		Imgproc.resize(crop, crop, cropSize);
-
+		
+		Mat key = crop.clone();
+//		String storagePath1 = Constants.disk + "/ocr/test/" + new Date().getTime() + "a.jpg";
+//		Util.mkDirs(storagePath1);
+//		Imgcodecs.imwrite(storagePath1, blackFont);
+		
+		// 遍历剪裁区域像素，除黑字以外都变为灰色
+		double[] gray = {150,150,150};
+//		double[] black = {0,0,0};
+		for(int x = 0; x < key.rows();x ++){
+			for( int y = 0; y < key.cols();y ++){
+				double[] data = key.get(x,y);
+				if((data[0] >= 0 && data[0] <= 100) && (data[1] >= 0 && data[1] <= 100) && (data[1] >= 0 && data[1] <= 100)){
+//					blackFont.put(x,y,black);
+				}else{					
+					key.put(x,y,gray);
+				}
+			}
+		}
+		String storagePath2 = Constants.disk + "/ocr/test/" + new Date().getTime() + "b.jpg";
+		Util.mkDirs(storagePath2);
+		Imgcodecs.imwrite(storagePath2, key);
+		
 		// 保存图片
 		if(test){
 			String storagePath = Constants.disk + "/ocr/faceRect/crop/" + new Date().getTime() + ".jpg";
@@ -122,9 +141,12 @@ public class Face {
 			Imgcodecs.imwrite(fileName, image);
 		}
 
-		return crop;
+		Map<String,Mat> map = new HashMap<String,Mat>();
+		map.put("key", key);
+		map.put("crop", crop);
+		return map;
 	}
-
+	
 	/**
 	 * 人脸识别检测
 	 * @param imgPath
@@ -206,7 +228,6 @@ public class Face {
 //					Imgproc.rectangle(src, point1, point2, scalar);
 //					Imgcodecs.imwrite("E:/ocr/test/face.jpg", src);
 
-					System.out.println(f.area());
 					if(maxArea < f.area()){
 						maxArea = f.area();
 					}
