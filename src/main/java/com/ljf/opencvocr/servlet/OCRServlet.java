@@ -1,10 +1,7 @@
 package com.ljf.opencvocr.servlet;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ljf.opencvocr.Model;
-import com.ljf.opencvocr.OCR;
-import com.ljf.opencvocr.Upload;
-import com.ljf.opencvocr.Util;
+import com.ljf.opencvocr.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +27,17 @@ public class OCRServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Util.clearFiles("D:/ocr/test");
+        Util.clearFiles(Constants.disk + "/ocr/test");
         Model uploadInfo = Upload.getInfo(req);
         Map<String, String> params = uploadInfo.getParams();
         String storagePath = params.get("storagePath");
         String storageName = params.get("storageName");
         BufferedImage img = uploadInfo.getImg();
         String tempPath = new Date().getTime() + ".jpg";
-        ImageIO.write(img, "jpg", Util.mkFile("D:/ocr" + storagePath + tempPath));
-        JSONObject ocrInfo = OCR.execute("D:/ocr" + storagePath + tempPath,false);
+        String srcImg = Constants.disk + "/ocr" + storagePath;
+        ImageIO.write(img, "jpg", Util.mkFile(srcImg + tempPath));
+        JSONObject ocrInfo = OCR.execute(srcImg + tempPath,false);
+//        JSONObject ocrInfo = OCR2.execute(srcImg + tempPath,false);
         System.out.println(ocrInfo);
         JSONObject json = new JSONObject();
         json.put("code", 200);

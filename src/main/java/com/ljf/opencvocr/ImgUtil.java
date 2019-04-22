@@ -128,7 +128,7 @@ public class ImgUtil {
 		Imgproc.findContours(srcDilate, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 		List<MatOfPoint> sortMat = sortMat(contours);
 		//清空文件夹
-        Util.clearFiles("D:/ocr/test/binary");
+        Util.clearFiles(Constants.disk + "/ocr/test/binary");
 		for(int i = 0;i < sortMat.size();i ++){
         	Rect rect = Imgproc.boundingRect(sortMat.get(i));
 
@@ -146,7 +146,7 @@ public class ImgUtil {
                 Mat srcImg = new Mat(src, rect);
                 Mat tmpImg = new Mat();
                 srcImg.copyTo(tmpImg);
-                String storagePath = "D:/ocr/test/block/" + i + ".jpg";
+                String storagePath = Constants.disk + "/ocr/test/block/" + i + ".jpg";
                 Util.mkDirs(storagePath);
                 Imgcodecs.imwrite(storagePath, tmpImg);
                 System.out.println(rect.area());
@@ -158,7 +158,7 @@ public class ImgUtil {
 
         System.out.println(resultStr);
 
-        String storagePath = "D:/ocr/test/src.jpg";
+        String storagePath = Constants.disk + "/ocr/test/src.jpg";
         Util.mkDirs(storagePath);
         Imgcodecs.imwrite(storagePath, src);
 
@@ -168,7 +168,9 @@ public class ImgUtil {
         boolean flag = false;
         while(!flag){
             String f = resultStr.substring(0,resultStr.indexOf("<br>"));
-            if("".equals(nameFilter(f)) || nameFilter(f).length() < 2){
+            String ff = filter(nameFilter(f));
+            System.out.println(ff);
+            if("".equals(filter(nameFilter(f))) || filter(nameFilter(f)).length() < 2){
                 resultStr = resultStr.substring(resultStr.indexOf("<br>") + 4);
             }else{
                 flag = true;
@@ -282,7 +284,8 @@ public class ImgUtil {
                 replace("】", "1").
                 replace("?", "7").
                 replace("了", "7").
-                replace("B", "8");
+                replace("B", "8").
+                replace("《","");
         String code = "";
         char[] textArray = temp.toCharArray();
         for(char c : textArray){
@@ -316,7 +319,7 @@ public class ImgUtil {
 
     //过滤特殊字符
     public static String filter(String text){
-        String s = " （）()|[]】\"〕′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
+        String s = " 『』（）()|[]】\"〕′_＿ˇ`~!@#$%^&*+={}':;＇,.<>＜＞\\＼/?～！＃￥％…＆＊＋｛｝‘；：”“’。，、？";
         char[] sArray = s.toCharArray();
         for(char c : sArray){
             text = text.replace(String.valueOf(c),"");
@@ -332,6 +335,7 @@ public class ImgUtil {
                 name = name.replace(String.valueOf(c),"");
             }
         }
+        name = name.replace("-","");
         return name.trim();
     }
 
@@ -635,7 +639,7 @@ public class ImgUtil {
         for (Integer i : data) {
             result += i;
         }
-        if(result != 0 && size != 0){        	
+        if(result != 0 && size != 0){
         	return (result / size);
         }else{
         	return 0;
@@ -676,7 +680,7 @@ public class ImgUtil {
             Imgproc.cvtColor(src,src,Imgproc.COLOR_BGR2GRAY);
             //二值化（自适应）
             int blockSize = 41;
-            int constValue = 30;
+            int constValue = 35;
             Imgproc.adaptiveThreshold(src, src, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, blockSize, constValue);
             //过滤杂纹
 //            Imgproc.medianBlur(src, src,3);
@@ -701,7 +705,7 @@ public class ImgUtil {
                 }
             }
 
-            Imgcodecs.imwrite(Util.mkDirs("D:/ocr/test/binary/" + new Date().getTime() + ".jpg"),src);
+            Imgcodecs.imwrite(Util.mkDirs(Constants.disk + "/ocr/test/binary/" + new Date().getTime() + ".jpg"),src);
             BufferedImage binary = Mat2BufImg(src, ".jpg");
 
 //        	BufferedImage src = ImageIO.read(file);
@@ -718,7 +722,26 @@ public class ImgUtil {
         System.out.println(result);
         return result;
     }
-    
+
+    public static String ocr2(Mat src){
+//    	File file = new File(path);
+        ITesseract instance = new Tesseract();
+        //设置训练库的位置
+        String classPath = Util.getClassPath();
+        String dataPath = classPath + "tessdata";
+        instance.setDatapath(dataPath);
+        instance.setLanguage("chi_sim");//chi_sim eng
+        String result = null;
+        BufferedImage binary = Mat2BufImg(src, ".jpg");
+        try {
+            result =  instance.doOCR(binary);
+        } catch (TesseractException e) {
+            e.printStackTrace();
+        }
+        System.out.println(result);
+        return result;
+    }
+
     public static String ocr(BufferedImage img){
         ITesseract instance = new Tesseract();
         String classPath = Util.getClassPath();
@@ -812,5 +835,59 @@ public class ImgUtil {
     public static void window(String title,Mat mat){
     	new ShowImage(title,mat);
     }
-    
+
+
+    /**
+     * opencv 检测图片亮度
+     * brightnessException 计算并返回一幅图像的色偏度以及，色偏方向
+     * cast 计算出的偏差值，小于1表示比较正常，大于1表示存在亮度异常；当cast异常时，da大于0表示过亮，da小于0表示过暗
+     * 返回值通过cast、da两个引用返回，无显式返回值
+     */
+    public static Integer brightnessException (Mat srcImage) {
+        Mat dstImage = new Mat();
+        // 将RGB图转为灰度图
+        Imgproc.cvtColor(srcImage,dstImage, Imgproc.COLOR_BGR2GRAY);
+        float a=0;
+        int Hist[] = new int[256];
+        for(int i=0;i<256;i++) {
+            Hist[i] = 0;
+        }
+        for(int i=0;i<dstImage.rows();i++)
+        {
+            for(int j=0;j<dstImage.cols();j++)
+            {
+                //在计算过程中，考虑128为亮度均值点
+                a+=(float)(dstImage.get(i,j)[0]-128);
+                int x=(int)dstImage.get(i,j)[0];
+                Hist[x]++;
+            }
+        }
+        float da =  a/(float)(dstImage.rows()*dstImage.cols());
+        System.out.println(da);
+        float D =Math.abs(da);
+        float Ma=0;
+        for(int i=0;i<256;i++)
+        {
+            Ma+=Math.abs(i-128-da)*Hist[i];
+        }
+        Ma/=(float)((dstImage.rows()*dstImage.cols()));
+        float M=Math.abs(Ma);
+        float K=D/M;
+        float cast = K;
+        System.out.printf("亮度指数： %f\n",cast);
+        if(cast>=1) {
+            System.out.printf("亮度："+da);
+            if(da > 0) {
+                System.out.printf("过亮\n");
+                return 2;
+            } else {
+                System.out.printf("过暗\n");
+                return 1;
+            }
+        } else {
+            System.out.printf("亮度：正常\n");
+            return 0;
+        }
+    }
+
 }

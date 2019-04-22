@@ -2,6 +2,9 @@ package com.ljf.opencvocr;
 
 public class Constants {
 
+    /**存储盘*/
+    public static final String disk = "E:";
+
     /**56个名族*/
     public static final String[] NATIONS = {
             "汉","壮","满","回","苗","维吾尔","土家","彝","蒙古","藏",

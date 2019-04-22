@@ -26,31 +26,32 @@ public class OCR {
 	public static JSONObject execute(String imgPath, boolean show){
 		//读取图像
 		//根据人脸识别裁剪身份证以内的区域
-		Mat src = Face.idcardCrop(imgPath,true);
+		Mat src = Face.idcardCrop(imgPath,false);
 		//灰度化
 		Mat gray = src.clone();
 		Imgproc.cvtColor(src, gray, Imgproc.COLOR_BGR2GRAY);
 		//二值化（自适应）
 		int blockSize = 25;
-		int constValue = 50;
-		Imgproc.adaptiveThreshold(gray, gray, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY_INV, blockSize, constValue);
+		int threshold = 60;
+		Imgproc.adaptiveThreshold(gray, gray, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, blockSize, threshold);
+        //保存图片（测试）
+        Imgcodecs.imwrite(Util.mkDirs(Constants.disk + "/ocr/test/" + new Date().getTime() + ".jpg"), gray);
+        //去除小于36像素的区域
+//        OCRUtil.clean(gray,36);
+        //二值图像反色
+        Core.bitwise_not(gray, gray);
 		//保存图片（测试）
-		Imgcodecs.imwrite(Util.mkDirs("D:/ocr/test/" + new Date().getTime() + ".jpg"), gray);
+		Imgcodecs.imwrite(Util.mkDirs(Constants.disk + "/ocr/test/" + new Date().getTime() + ".jpg"), gray);
 		//过滤杂纹
 	    Imgproc.medianBlur(gray, gray,3);
-//		Mat binary = gray.clone();
-//		//二值图像反色
-//		Core.bitwise_not(binary, binary);
-//		//保存图片（测试）
-//		Imgcodecs.imwrite(Util.mkDirs("D:/ocr/test/" + new Date().getTime() + ".jpg"), binary);
 		//膨胀（白色膨胀）
 		Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,new Size(3,3));//使用3*3交叉内核
 		Imgproc.dilate(gray, gray, kernel, new Point(-1, -1), 28);//以这个内核为中心膨胀N倍
 		//腐蚀（黑色膨胀）
 //		Imgproc.erode(gray, gray, kernel, new Point(-1, -1), 15);
 		//保存图片（测试）
-		Imgcodecs.imwrite(Util.mkDirs(Util.mkDirs("D:/ocr/test/" + new Date().getTime() + ".jpg")), gray);
-		JSONObject result = ImgUtil.findContours(gray,src);
+		Imgcodecs.imwrite(Util.mkDirs(Util.mkDirs(Constants.disk + "/ocr/test/" + new Date().getTime() + ".jpg")), gray);
+		JSONObject result = OCRUtil.findContours(gray,src);
 		return result;
 	}
 

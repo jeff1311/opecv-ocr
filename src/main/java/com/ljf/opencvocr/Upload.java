@@ -93,17 +93,17 @@ public class Upload {
 //						String baseSavePath = Constants.getFileUploadPath() + storagePath + newFileName;
 
 						// 5.保存路径是否存在，不存在则创建
-						File saveFolder = new File("E:/ocr/storage/" + storagePath);
-						if(!saveFolder.exists()){
-							saveFolder.mkdirs();
-						}
+//						File saveFolder = new File("E:/ocr/storage/" + storagePath);
+//						if(!saveFolder.exists()){
+//							saveFolder.mkdirs();
+//						}
 
 						// 6.写入文件
 //						File newFile = new File(baseSavePath);
 
 //						bi = ImageIO.read(fileItem.getInputStream());//图片泛红
-						byte[] byteArray = ImgUtil.toByteArray(fileItem.getInputStream());
-						bi = ImgUtil.toBufferedImage(byteArray);
+						byte[] byteArray = OCRUtil.toByteArray(fileItem.getInputStream());
+						bi = OCRUtil.toBufferedImage(byteArray);
 
 						// 7.删除临时文件
 						fileItem.delete();
