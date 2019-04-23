@@ -9,11 +9,8 @@ import org.opencv.core.Point;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -142,7 +139,7 @@ public class OCR {
         instance.setDatapath(dataPath);
         instance.setLanguage("chi_sim");//chi_sim eng
         String result = null;
-        BufferedImage binary = Mat2BufImg(img, ".jpg");
+        BufferedImage binary = ImgUtil.Mat2BufImg(img, ".jpg");
         try {
             result =  instance.doOCR(binary);
         } catch (TesseractException e) {
@@ -151,26 +148,6 @@ public class OCR {
         
 		return IdCardUtil.filterOcrInfo(result);
 	}
-
-	/**
-     * Mat转换成BufferedImage
-     * @param matrix 要转换的Mat
-     * @param fileExtension 格式为 ".jpg", ".png", etc
-     * @return
-     */
-    public static BufferedImage Mat2BufImg(Mat matrix, String fileExtension) {
-        MatOfByte mob = new MatOfByte();
-        Imgcodecs.imencode(fileExtension, matrix, mob);
-        byte[] byteArray = mob.toArray();
-        BufferedImage bufImage = null;
-        try {
-            InputStream in = new ByteArrayInputStream(byteArray);
-            bufImage = ImageIO.read(in);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return bufImage;
-    }
 
     public static void clean(Mat src,int size){
         //轮廓检测
