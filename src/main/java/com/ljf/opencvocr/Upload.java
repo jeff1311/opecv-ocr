@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,54 +54,26 @@ public class Upload {
 				@SuppressWarnings("unchecked")
 				List<FileItem> fileItemList = sfu.parseRequest(request);
 				// 4.遍历list，每迭代一个FileItem对象，调用其isFormField方法判断是否是上传文件
-				String storagePath = "";
-				Iterator<FileItem> fileItems1 = fileItemList.iterator();
-				while (fileItems1.hasNext()) {
-					FileItem fileItem = fileItems1.next();
-					if (fileItem.isFormField()) {// 普通表单元素
-						if (fileItem.isFormField()){
-							String name = fileItem.getFieldName();// name属性值
-							String value = fileItem.getString("utf-8");// name对应的value值
-							if("storagePath".equals(name)){
-								storagePath = value;
-							}
-							logger.info(name + " = " + value);
-							params.put(name, value);
-						}
-					}
-				}
-
-				Iterator<FileItem> fileItems2 = fileItemList.iterator();
-				while (fileItems2.hasNext()) {
-					FileItem fileItem = fileItems2.next();
-					if (!fileItem.isFormField()) {// 文件
+				Iterator<FileItem> fileItems = fileItemList.iterator();
+				while (fileItems.hasNext()) {
+					
+					FileItem fileItem = fileItems.next();
+					if(fileItem.isFormField()){// 普通表单元素
+						String name = fileItem.getFieldName();// name属性值
+						String value = fileItem.getString("utf-8");// name对应的value值
+						logger.info(name + " = " + value);
+						params.put(name, value);
+					}else{// 文件
 
 						// 文件名称
 						String fileName = fileItem.getName();
 						logger.info("原文件名：" + fileName);
 
-						// 新文件名,18位随机数
-						int random1 = (int)((Math.random() * 9 + 1) * 100000000);
-						int random2 = (int)((Math.random() * 9 + 1) * 100000000);
-						String random = String.valueOf(random1) + String.valueOf(random2);
-						String newFileName = random + ".jpg";
-						params.put("storageName", newFileName);
-						logger.info("新文件名：" + newFileName);
-//						String baseSavePath = Constants.getFileUploadPath() + storagePath + newFileName;
-
-						// 5.保存路径是否存在，不存在则创建
-//						File saveFolder = new File("E:/ocr/storage/" + storagePath);
-//						if(!saveFolder.exists()){
-//							saveFolder.mkdirs();
-//						}
-
-						// 6.写入文件
-//						File newFile = new File(baseSavePath);
-
+						InputStream is = fileItem.getInputStream();
 //						bi = ImageIO.read(fileItem.getInputStream());//图片泛红
-						byte[] byteArray = ImgUtil.toByteArray(fileItem.getInputStream());
+						byte[] byteArray = ImgUtil.toByteArray(is);
 						bi = ImgUtil.toBufferedImage(byteArray);
-
+						is.close();
 						// 7.删除临时文件
 						fileItem.delete();
 

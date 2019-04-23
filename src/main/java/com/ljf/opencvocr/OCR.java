@@ -106,7 +106,7 @@ public class OCR {
                     int h = y + rect.height;
                     Point point1 = new Point(x, y);
                     Point point2 = new Point(w, h);
-                    Scalar scalar = new Scalar(255, 0, 0);
+                    Scalar scalar = new Scalar(0, 255, 0);
                     Imgproc.rectangle(cropSrc2,point1,point2,scalar,1);
                 }
                 Mat r = new Mat(cropSrc, rect);
