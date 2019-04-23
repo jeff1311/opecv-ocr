@@ -1,19 +1,13 @@
 package com.ljf.opencvocr;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
+import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 面部识别
@@ -30,37 +24,55 @@ public class Face {
 
 	/**
 	 * 身份证正面裁剪（根据人脸识别）
-	 * @param imgPath
+	 * @param src
 	 */
-	public static Map<String,Mat> idcardCrop(String imgPath,boolean test){
-		//OpenCV 图像识别库一般位于 opencv\sources\data 下面
+	public static Map<String,Mat> idcardCrop(Mat src,boolean test){
+		// OpenCV图像识别库一般位于opencv/sources/data下面
 		// 1 读取OpenCV自带的人脸识别特征XML文件
 		String faceXmlPath = Util.getClassPath() + "/opencv/xml/haarcascade_frontalface_alt.xml";
 		CascadeClassifier facebook = new CascadeClassifier(faceXmlPath);
-		// 2 读取测试图片
-		Mat image = Imgcodecs.imread(imgPath);
 
-		// 3 修改尺寸
+		// 2 修改尺寸
 		Size size = null;
-		if(image.width() > image.height()){
-			if(image.width() > 2000){
+		if(src.width() > src.height()){
+			if(src.width() > 2000){
 				int width = 2000;
-				int height = width * image.height() / image.width();
+				int height = width * src.height() / src.width();
 				size = new Size(width, height);
-				Imgproc.resize(image, image, size);
+				Imgproc.resize(src, src, size);
 			}
 		}else{
-			if(image.height() > 2000){
+			if(src.height() > 2000){
 				int height = 2000;
-				int width = height * image.width() / image.height();
+				int width = height * src.width() / src.height();
 				size = new Size(width, height);
-				Imgproc.resize(image, image, size);
+				Imgproc.resize(src, src, size);
 			}
 		}
 
-		// 4 特征匹配
-		Rect[] faces = autoRotate(image, facebook);
-		// 5 算出身份证区域并裁图
+		// 3 特征匹配
+		Rect[] faces = autoRotate(src, facebook);
+
+        Mat srcClone = null;
+		if(test){
+            Util.mkDirs(Constants.disk + "/ocr/test");
+            srcClone = src.clone();
+            // 为每张识别到的人脸画一个圈
+            for (int i = 0; i < faces.length; i++) {
+                int x = faces[i].x;
+                int y = faces[i].y;
+                int w = x + faces[i].width;
+                int h = y + faces[i].height;
+                Point p1 = new Point(x, y);
+                Point p2 = new Point(w, h);
+                Scalar scalar = new Scalar(0, 255, 0);
+                Imgproc.rectangle(srcClone, p1, p2, scalar, 3);
+            }
+            String fileName1 = Constants.disk + "/ocr/test/a.jpg";
+            Imgcodecs.imwrite(Util.mkDirs(fileName1), srcClone);
+        }
+
+		// 4 算出身份证区域并裁图
 		int maxIndex = 0;
 		if(faces.length > 1){
 			double maxArea = 0d;
@@ -71,20 +83,21 @@ public class Face {
 				}
 			}
 		}
+
 		Rect faceRect = faces[maxIndex];
 
-		// 6 把人像区域置为白色
+		// 5 把人像区域置为白色
 		// 根据人脸检测得到的矩形位置算出大概人像区域
 		int x1 = (int) (faceRect.x - faceRect.width / 3.8);
 		int y1 = (int) (faceRect.y - faceRect.height / 1.8);
-		int w1 = image.width();
+		int w1 = src.width();
 		int h1 = (int) (y1 + faceRect.height * 2.1);
 		Point point3 = new Point(x1, y1);
 		Point point4 = new Point(w1, h1);
 		Rect f = new Rect(point3,point4);
-		Mat mask = new Mat(image, f);
+		Mat mask = new Mat(src, f);
 
-		// 遍历roi区域像素，变为白色
+		// 6 遍历roi区域像素，变为背景色
 		for(int x = 0; x < mask.rows();x ++){
 			for( int y = 0; y < mask.cols();y ++){
 				double[] data = mask.get(0,0);
@@ -95,46 +108,53 @@ public class Face {
 		int x0 = (int) (faceRect.x - faceRect.width * 2.8);
 		int y0 = (int) (faceRect.y - faceRect.height / 1.6);
 		int w0 = (int) (x0 + faceRect.width * 4.2);
-		int h0 = (int) (y0 + faceRect.height * 2.8);
+		int h0 = (int) (y0 + faceRect.height * 2.9);
 		Point point1 = new Point(x0, y0);
 		Point point2 = new Point(w0, h0);
 		Rect rect = new Rect(point1,point2);
-		Mat crop = new Mat(image, rect);
+		Mat crop = new Mat(src, rect);
 
-		// 7 修改尺寸
+		// 7 裁的区域统一修改尺寸宽度为1200，后面方便取文字区域膨胀操作
 		int width = 1200;
 		int height = width * crop.height() / crop.width();
 		Size cropSize = new Size(width, height);
 		Imgproc.resize(crop, crop, cropSize);
 		
 		Mat key = crop.clone();
-		// 遍历剪裁区域像素，除黑字以外都变为灰色
+
+		// 8 亮度检测，亮度过低灰度范围相应缩小
+        float v = ImgUtil.brightnessException(key);
+        int min = 0;
+        int max = 100;
+        if(v < 1){
+            max = 50;
+        }
+
+        // 9 遍历剪裁区域像素，除黑字以外都变为灰色
 		double[] gray = {150,150,150};
-//		double[] black = {0,0,0};
+		double[] black = {0,0,0};
 		for(int x = 0; x < key.rows();x ++){
 			for( int y = 0; y < key.cols();y ++){
 				double[] data = key.get(x,y);
-				if((data[0] >= 0 && data[0] <= 100) && (data[1] >= 0 && data[1] <= 100) && (data[1] >= 0 && data[1] <= 100)){
-//					blackFont.put(x,y,black);
-				}else{					
+				if((data[0] >= min && data[0] <= max) && (data[1] >= min && data[1] <= max) && (data[2] >= min && data[2] <= max)){
+					key.put(x,y,black);
+				}else{
 					key.put(x,y,gray);
 				}
 			}
 		}
-		String storagePath2 = Constants.disk + "/ocr/test/" + new Date().getTime() + "b.jpg";
-		Util.mkDirs(storagePath2);
-		Imgcodecs.imwrite(storagePath2, key);
-		
-		// 保存图片
-		if(test){
-			String storagePath = Constants.disk + "/ocr/faceRect/crop/" + new Date().getTime() + ".jpg";
-			Util.mkDirs(storagePath);
-			Imgcodecs.imwrite(storagePath, crop);
 
-			String fileName = Constants.disk + "/ocr/faceRect/" + new Date().getTime() + ".jpg";
-			Util.mkDirs(fileName);
-			Imgcodecs.imwrite(fileName, image);
-		}
+        // 保存图片
+        if(test){
+            String fileName2 = Constants.disk + "/ocr/test/b.jpg";
+            Imgcodecs.imwrite(Util.mkDirs(fileName2), src);
+
+            String fileName3 = Constants.disk + "/ocr/test/c.jpg";
+            Imgcodecs.imwrite(Util.mkDirs(fileName3), crop);
+
+            String fileName4 = Constants.disk + "/ocr/test/d.jpg";
+            Imgcodecs.imwrite(Util.mkDirs(fileName4), key);
+        }
 
 		Map<String,Mat> map = new HashMap<String,Mat>();
 		map.put("key", key);

@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 public class IdCardUtil {
 
     public static JSONObject filterOcrInfo(String ocrInfo){
+        System.out.println(ocrInfo);
         ocrInfo = filter(ocrInfo);
         ocrInfo = ocrInfo.replace("\n\n","\n");
         System.out.println(ocrInfo);
@@ -17,6 +18,15 @@ public class IdCardUtil {
         String[] array = ocrInfo.split("\n");
 
         JSONObject result = new JSONObject();
+        //防止前台undefined
+        result.put("name","");
+        result.put("gender","");
+        result.put("nation","");
+        result.put("year","");
+        result.put("month","");
+        result.put("day","");
+        result.put("address","");
+        result.put("idCode","");
 
         //找出身份证号码的那行
         int idCodeIndex = 0;
@@ -46,6 +56,10 @@ public class IdCardUtil {
             if(i == 1){
                 String nation = text;
                 nation = nation.replace(" ","");
+                nation = nation.replace("文","汉");
+                nation = nation.replace("又","汉");
+                nation = nation.replace("叉","汉");
+                nation = nation.replace("双","汉");
                 nation = nation.replace("汊","汉");
                 nation = nation.replace("况","汉");
                 for(String n : Constants.NATIONS){
@@ -144,6 +158,9 @@ public class IdCardUtil {
         char[] sArray = s.toCharArray();
         for(char c : sArray){
             text = text.replace(String.valueOf(c),"");
+        }
+        if(text.lastIndexOf("-") == (text.length() - 1)){
+            text = text.substring(0,text.length() - 1);
         }
         return text;
     }

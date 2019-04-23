@@ -60,7 +60,7 @@ public class Util {
         return path;
     }
 
-    public static void clearFiles(String path){
+    public static void cleanFiles(String path){
         File b = new File(path);
         File[] files = b.listFiles();
         if(files != null && files.length > 0){        	
