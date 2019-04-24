@@ -1,7 +1,10 @@
 package com.ljf.opencvocr.servlet;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ljf.opencvocr.*;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,12 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
-//资料：https://blog.csdn.net/ysc6688/article/category/2913009
-public class OCRServlet extends HttpServlet {
+public class OCRServlet extends HttpServlet{
 
 	private static final long serialVersionUID = 1L;
+
+	private List<BufferedImage> images = null;
 
 	@Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -26,20 +31,19 @@ public class OCRServlet extends HttpServlet {
         Util.cleanFiles(Constants.disk + "/ocr/test");
         Model uploadInfo = Upload.getInfo(req);
         Map<String, String> params = uploadInfo.getParams();
-        String storagePath = params.get("storagePath");
-        String storageName = params.get("storageName");
         String test = params.get("test");
-        BufferedImage img = uploadInfo.getImg();
-//        String tempPath = new Date().getTime() + ".jpg";
-//        String srcImg = Constants.disk + "/ocr" + storagePath;
-//        ImageIO.write(img, "jpg", Util.mkFile(srcImg + tempPath));
-        JSONObject ocrInfo = OCR.execute(img,true);
-        System.out.println(ocrInfo);
+        images = uploadInfo.getImages();
+
+        JSONArray ocrInfo = new JSONArray();
+        for(BufferedImage image : images){
+            JSONObject info = OCR.execute(image,true);
+            System.out.println(info);
+            ocrInfo.add(info);
+        }
+
         JSONObject json = new JSONObject();
         json.put("code", 200);
         json.put("ocrInfo", ocrInfo);
-        json.put("storageName", storageName);
-        json.put("baseImgPath", "/files" + storagePath);
         Util.returnInfo(resp, json);
     }
 

@@ -11,10 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Upload {
 
@@ -24,7 +21,7 @@ public class Upload {
 		// 从页面中拿取数据，因为上传页的编码格式跟一般的不同，使用的是enctype="multipart/form-data"
 		// form提交采用multipart/form-data,无法采用req.getParameter()取得数据
 		Map<String,String> params = new HashMap<String,String>();
-		BufferedImage bi = null;
+		List<BufferedImage> images = new ArrayList<BufferedImage>();;
 		// 判断上传表单是否为multipart/form-data类型
 		if (ServletFileUpload.isMultipartContent(request)) {
 
@@ -64,15 +61,15 @@ public class Upload {
 						logger.info(name + " = " + value);
 						params.put(name, value);
 					}else{// 文件
-
 						// 文件名称
 						String fileName = fileItem.getName();
 						logger.info("原文件名：" + fileName);
 
 						InputStream is = fileItem.getInputStream();
-//						bi = ImageIO.read(fileItem.getInputStream());//图片泛红
 						byte[] byteArray = ImgUtil.toByteArray(is);
-						bi = ImgUtil.toBufferedImage(byteArray);
+						BufferedImage image = ImgUtil.toBufferedImage(byteArray);
+						images.add(image);
+						//关闭流
 						is.close();
 						// 7.删除临时文件
 						fileItem.delete();
@@ -88,7 +85,7 @@ public class Upload {
 
 		}
 
-		return new Model(params, bi);
+		return new Model(params, images);
 	}
 
 }

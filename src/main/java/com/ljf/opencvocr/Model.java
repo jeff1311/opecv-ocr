@@ -1,16 +1,17 @@
 package com.ljf.opencvocr;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Map;
 
 public class Model {
 
     private Map<String,String> params;
-    private BufferedImage img;
+    private List<BufferedImage> images;
 
-    public Model(Map<String,String> params,BufferedImage img){
+    public Model(Map<String,String> params,List<BufferedImage> images){
         this.params = params;
-        this.img = img;
+        this.images = images;
     }
 
     public Map<String, String> getParams() {
@@ -19,11 +20,11 @@ public class Model {
     public void setParams(Map<String, String> params) {
         this.params = params;
     }
-    public BufferedImage getImg() {
-        return img;
+    public List<BufferedImage> getImages() {
+        return this.images;
     }
-    public void setImg(BufferedImage img) {
-        this.img = img;
+    public void setImages(List<BufferedImage> images) {
+        this.images = images;
     }
 
 }

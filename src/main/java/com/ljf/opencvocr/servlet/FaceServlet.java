@@ -30,19 +30,19 @@ public class FaceServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Model upload = Upload.getInfo(req);
-        Map<String, String> params = upload.getParams();
-        String storagePath = params.get("storagePath");
-        String storageName = params.get("storageName");
-        BufferedImage img = upload.getImg();
-        String outputPath = "E:/ocr/face/";
-        String imgName = new Date().getTime() + ".jpg";
-        ImageIO.write(img,"jpg",new File(outputPath + imgName));
-        String imgPath = Face.detect(outputPath + imgName,outputPath);
-        JSONObject json = new JSONObject();
-        json.put("code", 200);
-        json.put("imgPath", "/img/" + imgPath);
-        Util.returnInfo(resp,json);
+//        Model upload = Upload.getInfo(req);
+//        Map<String, String> params = upload.getParams();
+//        String storagePath = params.get("storagePath");
+//        String storageName = params.get("storageName");
+//        BufferedImage img = upload.getImg();
+//        String outputPath = "E:/ocr/face/";
+//        String imgName = new Date().getTime() + ".jpg";
+//        ImageIO.write(img,"jpg",new File(outputPath + imgName));
+//        String imgPath = Face.detect(outputPath + imgName,outputPath);
+//        JSONObject json = new JSONObject();
+//        json.put("code", 200);
+//        json.put("imgPath", "/img/" + imgPath);
+//        Util.returnInfo(resp,json);
     }
 
 }

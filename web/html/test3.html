@@ -2,17 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>OCR</title>
+<title>身份证识别</title>
     <link rel="stylesheet" type="text/css" href="/css/loaders.css"/>
     <link rel="stylesheet" type="text/css" href="/css/ocridcard.css"/>
-    <style type="text/css">
-
-    </style>
 </head>
 <body>
     <div class="main">
         <input type="file" id="img" multiple="multiple">
-        <button id="select">选择图片</button>
+        <button class="select" id="select">选择图片</button>
         <img id="view">
         <div id="idCard"></div>
     </div>
@@ -27,6 +24,7 @@ $('#select').click(function(){
 document.getElementById('img').onchange = function(){
 	$('#idCard').html('');
 	console.log(this.files.length);
+	var files = this.files;
     var file = this.files[0];
     //创建FileReader
     var re = new FileReader();
@@ -35,16 +33,17 @@ document.getElementById('img').onchange = function(){
     //读取完成后显示BASE64
     re.onload = function(){
         $('#view').attr('src',re.result);
-        ocr(file);
+        ocr(files);
     }
 
 }
 
-function ocr(file){
+function ocr(files){
     var data = new FormData();
     data.append('test',1);
-    data.append('storagePath',"/test/");
-    data.append('file', file); // file 对象
+    for(var i = 0;i < files.length;i ++){
+        data.append('file' + i, files[i]); // file 对象
+    }
     // 提交
     $.ajax({
         url: '/ocr',
@@ -67,7 +66,7 @@ function ocr(file){
 		},
         success: function(json){
             console.log(json);
-            var ocrInfo = json.ocrInfo;
+            var ocrInfo = json.ocrInfo[0];
             var idCard = ['<div class="idCard">',
                           '		<div class="text">',
                           '			<div class="name">',

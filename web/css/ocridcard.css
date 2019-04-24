@@ -9,7 +9,7 @@ body{
     margin:0 auto;
     width:500px;
 }
-#select{
+.select{
     margin-top:10px;
     margin-bottom:10px;
     width:100%;
@@ -26,7 +26,7 @@ body{
     -o-transition: all 1s ease 0s;
     transition: all 1s ease 0s;
 }
-#select:hover{
+.select:hover{
     background-color:#00a5dc;
 }
 #img{
