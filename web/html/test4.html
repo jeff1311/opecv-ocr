@@ -114,4 +114,57 @@
     }
 
 </script>
+<!--<script>-->
+
+    <!--var webSocket = null;-->
+    <!--var urlPrefix = location.href.split(':')[0];-->
+    <!--var baseUrl = location.href.split('/html')[0].replace(urlPrefix == 'http' ? 'http' : 'https', urlPrefix == 'http' ? 'ws' : 'wss');-->
+    <!--var webSocketUrl = baseUrl + '/websocket/';-->
+    <!--//判断当前浏览器是否支持webSocket-->
+    <!--if ('webSocket' in window) {-->
+        <!--webSocket = new WebSocket(webSocketUrl);-->
+    <!--} else if ('MozwebSocket' in window) {-->
+        <!--webSocket = new MozWebSocket(webSocketUrl);-->
+    <!--} else {-->
+        <!--console.log("此浏览器不支持webSocket");-->
+    <!--}-->
+
+    <!--//连接发生错误的回调方法-->
+    <!--webSocket.onerror = function () {-->
+        <!--alert("webSocket连接发生错误");-->
+    <!--};-->
+
+    <!--//连接成功建立的回调方法-->
+    <!--webSocket.onopen = function () {-->
+        <!--console.log("webSocket连接成功");-->
+    <!--}-->
+
+    <!--//接收到消息的回调方法-->
+    <!--webSocket.onmessage = function (event) {-->
+        <!--//alert('签名成功！');-->
+    <!--}-->
+
+    <!--//连接关闭的回调方法-->
+    <!--webSocket.onclose = function () {-->
+        <!--console.log("webSocket连接关闭");-->
+    <!--}-->
+
+    <!--//监听窗口关闭事件，当窗口关闭时，主动去关闭webSocket连接，防止连接还没断开就关闭窗口，server端会抛异常。-->
+    <!--window.onbeforeunload = function () {-->
+        <!--webSocket.close();-->
+    <!--}-->
+
+    <!--// webSocket.send(info.STORE_FILENAME);-->
+
+    <!--location /websocket {-->
+    <!--proxy_pass https://192.168.6.237:9443;-->
+    <!--proxy_http_version 1.1;-->
+    <!--#proxy_connect_timeout 60s; #连接超时时间-->
+    <!--proxy_read_timeout 600s; #读取超时时间-->
+    <!--#proxy_send_timeout 60s; #请求超时时间-->
+    <!--proxy_set_header Upgrade $http_upgrade;-->
+    <!--proxy_set_header Connection "upgrade";-->
+    <!--}-->
+
+<!--</script>-->
 </html>

@@ -91,7 +91,6 @@ public class OCRServlet extends HttpServlet{
         int maxTime = 10 * 60;//超时时间设为一分钟
         int time = 0;
         while(++ time < maxTime){
-            System.out.println(time);
             try {
                 //每0.1秒循环一次，降低循环次数
                 Thread.sleep(100);

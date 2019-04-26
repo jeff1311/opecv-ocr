@@ -53,7 +53,7 @@ body{
     transition: all 1s ease 0s;
 }
 .idCard:hover{
-    box-shadow: 0 0 10px rgba(128,128,128,0.6);
+    box-shadow: 0 0 10px rgba(128,128,128,1);
 }
 .name .n,.gender-nation .n,.birth .n,.address .n{
     /*margin-right:20px;*/
