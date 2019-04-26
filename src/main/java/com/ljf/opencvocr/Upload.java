@@ -44,7 +44,7 @@ public class Upload {
 
 				// 2.创建ServletFileUpload对象，并设置上传文件的大小限制。ServletFileUpload：负责处理上传的文件数据，并将每部分的数据封装成一到 FileItem 对象中。
 				ServletFileUpload sfu = new ServletFileUpload(factory);
-				sfu.setSizeMax(5 * 1024 * 1024);//以Byte为单位,不能超过5M(1024B = 1KB,1024KB = 1MB)
+				sfu.setSizeMax(10 * 1024 * 1024);//以Byte为单位,不能超过5M(1024B = 1KB,1024KB = 1MB)
 				sfu.setHeaderEncoding("utf-8");
 
 				// 3.调用ServletFileUpload.parseRequest方法解析request对象，得到一个保存了所有上传内容的List对象。

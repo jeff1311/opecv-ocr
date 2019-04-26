@@ -31,20 +31,20 @@ public class OCR {
         //创建一个Mat,颜色为白色
         Mat src = new Mat(srcBi.getHeight(), srcBi.getWidth(), CvType.CV_8UC3,new Scalar(255, 255, 255));
         //BufferedImage转Mat
-        for(int i = 0;i < src.rows();i ++){
-            for(int j = 0;j < src.cols();j ++){
-                int rgba = srcBi.getRGB(j,i);
+        for(int y = 0;y < src.rows();y ++){
+            for(int x = 0;x < src.cols();x ++){
+                int rgba = srcBi.getRGB(x,y);
                 Color col = new Color(rgba, true);
                 int r = col.getRed();
                 int g = col.getGreen();
                 int b = col.getBlue();
                 double[] data = {b,g,r};
-                src.put(i,j,data);
+                src.put(y,x,data);
             }
         }
 
 		//根据人脸识别裁剪身份证以内的区域
-		Map<String, Mat> crop = Face.idcardCrop(src,true);
+		Map<String, Mat> crop = Face.idcardCrop(src,false);
 		Mat cropSrc = crop.get("crop");
 		Mat cropSrc2 = null;
 		if(test){
@@ -117,10 +117,10 @@ public class OCR {
                 //去除面积小于20像素的区域
                 clean(r,20);
                 Mat roi = new Mat(img, rect);
-                for(int x = 0;x < roi.rows();x ++){
-                    for(int y = 0;y < roi.cols();y ++){
-                        double[] data = r.get(x,y);
-                        roi.put(x, y, data);
+                for(int y = 0;y < roi.rows();y ++){
+                    for(int x = 0;x < roi.cols();x ++){
+                        double[] data = r.get(y,x);
+                        roi.put(y, x, data);
                     }
                 }
 
@@ -161,10 +161,10 @@ public class OCR {
             Rect br = Imgproc.boundingRect(contours.get(j));
             if(br.area() <= size){
                 Mat r = new Mat(src, br);
-                for(int x = 0;x < r.rows();x ++){
-                    for(int y = 0;y < r.cols();y ++){
+                for(int y = 0;y < r.rows();y ++){
+                    for(int x = 0;x < r.cols();x ++){
                         double[] data = {255};
-                        r.put(x, y, data);
+                        r.put(y, x, data);
                     }
                 }
             }
