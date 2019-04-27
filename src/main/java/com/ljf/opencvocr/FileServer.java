@@ -7,6 +7,7 @@ import org.java_websocket.server.WebSocketServer;
 import java.nio.ByteBuffer;
 
 public class FileServer extends WebSocketServer {
+	
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
 
